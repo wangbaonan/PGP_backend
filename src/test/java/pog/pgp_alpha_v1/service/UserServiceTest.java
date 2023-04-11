@@ -77,13 +77,13 @@ class UserServiceTest {
 
         // 邮箱格式
         mail = "sssX@";
-        userAccount = "wangbaonan4";
+        userAccount = "wangbaonan5";
         checkPassword = "12345678";
         userRegister = userService.userRegister(userAccount, userPassword, checkPassword, mail, username);
         Assertions.assertEquals(-1, userRegister);
 
         // 成功注册
-        userAccount = "wangbaonan4";
+        userAccount = "wangbaonan5";
         mail = "sssx@163.com";
         userRegister = userService.userRegister(userAccount, userPassword, checkPassword, mail, username);
         Assertions.assertTrue(userRegister > 0); // id >0

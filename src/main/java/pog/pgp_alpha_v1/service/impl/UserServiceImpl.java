@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import pog.pgp_alpha_v1.constant.Constants;
 import pog.pgp_alpha_v1.mapper.UserMapper;
 import pog.pgp_alpha_v1.model.User;
 import pog.pgp_alpha_v1.service.UserService;
@@ -22,8 +23,6 @@ import java.util.regex.Pattern;
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         implements UserService {
-    final String emailRegex = "^(\\w+([-.][A-Za-z0-9]+)*){3,18}@\\w+([-.][A-Za-z0-9]+)*\\.\\w+([-.][A-Za-z0-9]+)*$";
-    final String accountRegex = "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？\\s+]";
 
     @Resource
     private UserMapper userMapper;
@@ -44,12 +43,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         // 校验邮箱格式
         if ((email != null) && (!email.isEmpty())) {
-            if(!Pattern.matches(emailRegex, email)){
+            if(!Pattern.matches(Constants.emailRegex, email)){
                 return -1;
             }
         }
         // 账户不能包含重复字符 正则表达式
-        Matcher matcher = Pattern.compile(accountRegex).matcher(userAccount);
+        Matcher matcher = Pattern.compile(Constants.accountRegex).matcher(userAccount);
         if (matcher.find()) {
             return -1;
         }
