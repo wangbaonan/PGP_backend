@@ -31,7 +31,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Resource
     private UserMapper userMapper;
-    private UserService userService;
 
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword, String email, String username) {
@@ -40,11 +39,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             return -1;
         }
         // 校验账户名长度
-        if (userAccount.length() < 4) {
+        if (userAccount.length() < USERNAME_MAX_LENGTH) {
             return -1;
         }
         // 校验密码长度
-        if (userPassword.length() < 8 || checkPassword.length() < 8) {
+        if (userPassword.length() < PASSWORD_MAX_LENGTH || checkPassword.length() < PASSWORD_MAX_LENGTH) {
             return -1;
         }
         // 校验邮箱格式
@@ -97,11 +96,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             return null;
         }
         // 校验账户名长度
-        if (userAccount.length() < 4) {
+        if (userAccount.length() < USERNAME_MAX_LENGTH) {
             return null;
         }
         // 校验密码长度
-        if (userPassword.length() < 8) {
+        if (userPassword.length() < PASSWORD_MAX_LENGTH) {
             return null;
         }
         // 账户不能包含重复字符 正则表达式

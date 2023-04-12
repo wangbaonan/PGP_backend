@@ -7,6 +7,8 @@ import pog.pgp_alpha_v1.service.VerificationCodeService;
 import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
+import static pog.pgp_alpha_v1.constant.Constants.*;
+
 @Service
 public class VerificationCodeServiceImpl implements VerificationCodeService {
 
@@ -21,14 +23,14 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     @Override
     public void storeVerificationCode(String email, String verificationCode) {
         // 10分钟过期
-        stringRedisTemplate.opsForValue().set(email, verificationCode, 10, TimeUnit.MINUTES);
+        stringRedisTemplate.opsForValue().set(email, verificationCode, VERIFY_CODE_EXPIRE_TIME, TimeUnit.MINUTES);
     }
 
     /**
      * 验证验证码
      * @param email 邮箱
      * @param submittedCode 提交的验证码
-     * @return
+     * @return 是否正确
      */
     @Override
     public boolean verifyCode(String email, String submittedCode) {
@@ -38,9 +40,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     }
 
     public String generateVerificationCode() {
-        int min = 100000;
-        int max = 999999;
-        int code = (int) (Math.random() * (max - min) + min);
+        int code = (int) (Math.random() * (VERIFY_CODE_MAX - VERIFY_CODE_MIN) + VERIFY_CODE_MIN);
         return String.valueOf(code);
     }
 
