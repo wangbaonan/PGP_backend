@@ -7,13 +7,13 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/pgp
     username: root
-    password: 110680100029wbn
+    password: *********
   # Mail Config
   mail:
     host: smtp.163.com
     port: 25
-    username: wangbaonandlut@163.com
-    password: NYVJSZHWLOQIYFYT
+    username: *********
+    password: *********
     properties:
       mail:
         smtp:
