@@ -17,3 +17,17 @@ mybatis-plus:
       logic-delete-field: isDelete # 全局逻辑删除的实体字段名
       logic-delete-value: 1 # 逻辑已删除值
       logic-not-delete-value: 0 # 逻辑未删除值
+redis:
+  host: localhost
+  port: 6379
+mail:
+  host: smtp.exmail.qq.com
+  port: 465
+  username: 21212030012@m.fudan.edu.cn
+  password: Wangbaonan1
+  properties:
+    mail:
+      smtp:
+        auth: true
+        starttls:
+          enable: true

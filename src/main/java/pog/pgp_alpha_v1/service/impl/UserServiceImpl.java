@@ -23,6 +23,7 @@ import static pog.pgp_alpha_v1.constant.Constants.*;
  * 2023-04-10 22:21:40
  * 用户服务实现类
  */
+
 @Service
 @Slf4j // log
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>

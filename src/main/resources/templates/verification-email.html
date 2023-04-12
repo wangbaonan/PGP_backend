@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Verification Email</title>
+</head>
+<body>
+<p>Dear User,</p>
+<p>Thank you for registering on PGP. To complete the registration process, please enter the following verification code:</p>
+<p th:text="${verificationCode}"></p>
+<p>Best Regards,</p>
+<p>PGP FDU</p>
+</body>
+</html>
