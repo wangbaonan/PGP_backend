@@ -1,4 +1,4 @@
-package pog.pgp_alpha_v1.constant;
+package pog.pgp_alpha_v1.constants;
 
 public class Constants {
 
@@ -59,5 +59,7 @@ public class Constants {
     /**
      * 验证码邮件发送成功
      */
-    public static final String  VERIFY_CODE_EMAIL_SEND_SUCCESS = "Verification code email sent successfully";
+    public static final String  VERIFY_CODE_EMAIL_SEND_SUCCESS = "Verification code email sent successfully!";
+
+    public static final String  LOGOUT_SUCCESS = "Logout successfully!";
 }

@@ -7,7 +7,7 @@ import pog.pgp_alpha_v1.service.VerificationCodeService;
 import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
-import static pog.pgp_alpha_v1.constant.Constants.*;
+import static pog.pgp_alpha_v1.constants.Constants.*;
 
 @Service
 public class VerificationCodeServiceImpl implements VerificationCodeService {

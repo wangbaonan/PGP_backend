@@ -1,7 +1,7 @@
 package pog.pgp_alpha_v1.common;
 
 
-import static pog.pgp_alpha_v1.constant.Constants.SUCCESS;
+import static pog.pgp_alpha_v1.constants.Constants.SUCCESS;
 
 public class ResultUtils {
 

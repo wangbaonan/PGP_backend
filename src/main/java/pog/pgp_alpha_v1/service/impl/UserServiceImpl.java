@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static pog.pgp_alpha_v1.constant.Constants.*;
+import static pog.pgp_alpha_v1.constants.Constants.*;
 
 /**
  * @author Wangbaonan

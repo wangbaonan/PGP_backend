@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static pog.pgp_alpha_v1.constant.Constants.*;
+import static pog.pgp_alpha_v1.constants.Constants.*;
 
 /**
  * 用户接口
@@ -178,12 +178,12 @@ public class UserController {
      * @return int
      */
     @PostMapping("/logout")
-    public BaseResponse<Integer> userLogout(HttpServletRequest request) {
+    public BaseResponse<String> userLogout(HttpServletRequest request) {
         if (request == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         int result = userService.userLogout(request);
-        return ResultUtils.success(result);
+        return ResultUtils.success(LOGOUT_SUCCESS);
     }
 
     /**

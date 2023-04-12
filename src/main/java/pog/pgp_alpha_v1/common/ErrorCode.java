@@ -5,7 +5,7 @@ package pog.pgp_alpha_v1.common;
  */
 public enum ErrorCode {
 
-    SUCCESS(0, "ok", ""),
+    SUCCESS(0, "OK", ""),
     PARAMS_ERROR(40000, "请求参数错误", ""),
     NULL_ERROR(40001, "请求数据为空", ""),
     NOT_LOGIN(40100, "未登录", ""),
