@@ -1,6 +1,7 @@
 package pog.pgp_alpha_v1.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,8 @@ public class EmailServiceImpl implements EmailService {
     @Resource
     private TemplateEngine templateEngine;
 
+    @Value("${spring.mail.username}")
+    private String fromMail;
 
     /**
      * 发送验证码邮件
@@ -42,9 +45,9 @@ public class EmailServiceImpl implements EmailService {
         // 发送邮件
         try {
             // 发件人
-            helper.setFrom("wangbaonandlut@163.com");
+            helper.setFrom(fromMail);
             helper.setTo(to);
-            // 收件人
+            // 邮件主题
             helper.setSubject(subject);
             // 邮件内容
             helper.setText(body, true);

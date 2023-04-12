@@ -131,15 +131,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         boolean matches = passwordEncoder.matches(userPassword, encodedPassword);
         if (matches) {
             // 用户脱敏
-            User safetyUser = new User();
-            safetyUser.setId(user.getId());
-            safetyUser.setUserAccount(user.getUserAccount());
-            safetyUser.setMail(user.getMail());
-            safetyUser.setUserStatus(user.getUserStatus());
-            safetyUser.setUsername(user.getUsername());
-            safetyUser.setCreateTime(user.getCreateTime());
-            safetyUser.setUserRole(user.getUserRole());
-
+            User safetyUser = getSafetyUser(user);
             // 记录用户的登录态 Session
             // 单个服务器登录 如果是分布式登录改成Redis
             request.getSession().setAttribute(USER_LOGIN_STATE, safetyUser);
@@ -167,6 +159,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         return false;
     }
+
+    @Override
+    public int userLogout(HttpServletRequest request) {
+        // 移除登录态
+        request.getSession().removeAttribute(USER_LOGIN_STATE);
+        return 1;
+    }
+
+
+    @Override
+    public User getSafetyUser(User user) {
+        User safetyUser = new User();
+        safetyUser.setId(user.getId());
+        safetyUser.setUserAccount(user.getUserAccount());
+        safetyUser.setMail(user.getMail());
+        safetyUser.setUserStatus(user.getUserStatus());
+        safetyUser.setUsername(user.getUsername());
+        safetyUser.setCreateTime(user.getCreateTime());
+        safetyUser.setUserRole(user.getUserRole());
+
+        return safetyUser;
+    }
+
+
 }
 
 

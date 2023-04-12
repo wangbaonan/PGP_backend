@@ -49,4 +49,15 @@ public class Constants {
      * 管理员权限
      */
     public static final Integer ADMIN_ROLE = 1;
+
+    // ---- 状态码 ----
+    /**
+     * 成功
+     */
+    public static final Integer SUCCESS = 0;
+
+    /**
+     * 验证码邮件发送成功
+     */
+    public static final String  VERIFY_CODE_EMAIL_SEND_SUCCESS = "Verification code email sent successfully";
 }

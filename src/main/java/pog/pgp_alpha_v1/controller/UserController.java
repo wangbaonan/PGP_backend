@@ -2,9 +2,12 @@ package pog.pgp_alpha_v1.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import pog.pgp_alpha_v1.common.BaseResponse;
+import pog.pgp_alpha_v1.common.ErrorCode;
+import pog.pgp_alpha_v1.common.ResultUtils;
+import pog.pgp_alpha_v1.exception.BusinessException;
 import pog.pgp_alpha_v1.model.User;
 import pog.pgp_alpha_v1.model.request.UserLoginRequest;
 import pog.pgp_alpha_v1.model.request.UserRegisterRequest;
@@ -16,11 +19,10 @@ import pog.pgp_alpha_v1.service.VerificationCodeService;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static pog.pgp_alpha_v1.constant.Constants.ADMIN_ROLE;
-import static pog.pgp_alpha_v1.constant.Constants.USER_LOGIN_STATE;
+import static pog.pgp_alpha_v1.constant.Constants.*;
 
 /**
  * 用户接口
@@ -38,9 +40,9 @@ public class UserController {
     private EmailService emailService;
 
     @PostMapping("/register")
-    public Long userRegister(@RequestBody UserRegisterRequest userRegisterRequest){
+    public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest){
         if(userRegisterRequest == null){
-            return null;
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
         }
         // 从前端传来的请求体中获取参数
         String userAccount = userRegisterRequest.getUserAccount();
@@ -52,13 +54,14 @@ public class UserController {
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword, username, mail)){
             return null;
         }
-        return userService.userRegister(userAccount, userPassword, checkPassword, mail, username);
+        long result = userService.userRegister(userAccount, userPassword, checkPassword, mail, username);
+        return ResultUtils.success(result);
     }
 
     @PostMapping("/login")
-    public User userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request){
+    public BaseResponse<User> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request){
         if(userLoginRequest == null){
-            return null;
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
         }
         // 从前端传来的请求体中获取参数
         String userAccount = userLoginRequest.getUserAccount();
@@ -68,35 +71,39 @@ public class UserController {
         if (StringUtils.isAnyBlank(userAccount, userPassword)){
             return null;
         }
-        return userService.userLogin(userAccount, userPassword, request);
+        User user = userService.userLogin(userAccount, userPassword, request);
+        return ResultUtils.success(user);
     }
 
     @GetMapping("/search")
-    public List<User> searchUsers(String username, HttpServletRequest request){
+    public BaseResponse<List<User>> searchUsers(String username, HttpServletRequest request){
         if(isAdmin(request)){
-            return new ArrayList<>();
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         if(StringUtils.isNotBlank(username)){
             queryWrapper.like("username", username); //模糊查询
         }
-        return userService.list();
+        List<User> userList = userService.list(queryWrapper);
+        List<User> list = userList.stream().map(user -> userService.getSafetyUser(user)).collect(Collectors.toList());
+        return ResultUtils.success(list);
     }
 
     @PostMapping("/delete")
-    public boolean deleteUser(@RequestBody long id, HttpServletRequest request){
+    public BaseResponse<Boolean> deleteUser(@RequestBody long id, HttpServletRequest request){
         if(!isAdmin(request)){
-            return false;
+            throw new BusinessException(ErrorCode.NO_AUTH);
         }
         if(id <= 0){
-            return false;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         // 逻辑删除
-        return userService.removeById(id);
+        boolean deleteFlag = userService.removeById(id);
+        return ResultUtils.success(deleteFlag);
     }
 
     @PostMapping("/sendVerificationCode")
-    public ResponseEntity<Void> sendVerificationCode(@RequestBody UserSendVerifyCodeRequest userSendVerifyCodeRequest) {
+    public BaseResponse<String> sendVerificationCode(@RequestBody UserSendVerifyCodeRequest userSendVerifyCodeRequest) {
         // 获取邮箱
         String email = userSendVerifyCodeRequest.getMail();
         // 生成验证码
@@ -104,7 +111,7 @@ public class UserController {
         // 将邮箱与验证码绑定 存入Redis 并发送邮件
         verificationCodeService.storeVerificationCode(email, verificationCode);
         emailService.sendVerificationEmail(email, "Verification Code", verificationCode);
-        return ResponseEntity.ok().build();
+        return ResultUtils.success(VERIFY_CODE_EMAIL_SEND_SUCCESS);
     }
 
     @PostMapping("/verify")
@@ -130,6 +137,29 @@ public class UserController {
             redirectAttributes.addFlashAttribute("error", "Invalid verification code");
             return "redirect:/verification";
         }
+    }
+
+    @GetMapping("/current")
+    public BaseResponse<User> getCurrentUser(HttpServletRequest request) {
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User currentUser = (User) userObj;
+        if (currentUser == null) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN);
+        }
+        long userId = currentUser.getId();
+        // TODO 校验用户是否合法
+        User user = userService.getById(userId);
+        User safetyUser = userService.getSafetyUser(user);
+        return ResultUtils.success(safetyUser);
+    }
+
+    @PostMapping("/logout")
+    public BaseResponse<Integer> userLogout(HttpServletRequest request) {
+        if (request == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        int result = userService.userLogout(request);
+        return ResultUtils.success(result);
     }
 
     /**
