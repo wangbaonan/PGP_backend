@@ -14,7 +14,6 @@ spring:
     port: 25
     username: wangbaonandlut@163.com
     password: NYVJSZHWLOQIYFYT
-    protocol: smtp
     properties:
       mail:
         smtp:

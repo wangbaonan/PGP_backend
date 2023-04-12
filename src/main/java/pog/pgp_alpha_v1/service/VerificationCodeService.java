@@ -4,4 +4,5 @@ public interface VerificationCodeService {
     void storeVerificationCode(String email, String verificationCode);
     boolean verifyCode(String email, String submittedCode);
     void deleteVerificationCode(String email);
+    String generateVerificationCode();
 }

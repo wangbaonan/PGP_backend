@@ -115,9 +115,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         queryWrapper.eq("userAccount", userAccount);
         User user = userMapper.selectOne(queryWrapper);
 
-        //用户不存在
+        // 用户不存在
         if (user == null) {
             log.info("User Login failed, user account : " + userAccount + " can't found!");
+            return null;
+        }
+        // 用户未激活
+        if (user.getUserVerify().equals(0)) {
+            log.info("User Login failed, user account : " + userAccount + " is not verified!");
             return null;
         }
 

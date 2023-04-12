@@ -42,6 +42,7 @@ public class EmailServiceImpl implements EmailService {
         // 发送邮件
         try {
             // 发件人
+            helper.setFrom("wangbaonandlut@163.com");
             helper.setTo(to);
             // 收件人
             helper.setSubject(subject);

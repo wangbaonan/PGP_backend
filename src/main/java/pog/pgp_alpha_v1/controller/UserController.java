@@ -2,12 +2,15 @@ package pog.pgp_alpha_v1.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pog.pgp_alpha_v1.model.User;
 import pog.pgp_alpha_v1.model.request.UserLoginRequest;
 import pog.pgp_alpha_v1.model.request.UserRegisterRequest;
+import pog.pgp_alpha_v1.model.request.UserSendVerifyCodeRequest;
 import pog.pgp_alpha_v1.model.request.UserVerifyRequest;
+import pog.pgp_alpha_v1.service.EmailService;
 import pog.pgp_alpha_v1.service.UserService;
 import pog.pgp_alpha_v1.service.VerificationCodeService;
 
@@ -31,6 +34,8 @@ public class UserController {
     private UserService userService;
     @Resource
     private VerificationCodeService verificationCodeService;
+    @Resource
+    private EmailService emailService;
 
     @PostMapping("/register")
     public Long userRegister(@RequestBody UserRegisterRequest userRegisterRequest){
@@ -90,6 +95,18 @@ public class UserController {
         return userService.removeById(id);
     }
 
+    @PostMapping("/sendVerificationCode")
+    public ResponseEntity<Void> sendVerificationCode(@RequestBody UserSendVerifyCodeRequest userSendVerifyCodeRequest) {
+        // 获取邮箱
+        String email = userSendVerifyCodeRequest.getMail();
+        // 生成验证码
+        String verificationCode = verificationCodeService.generateVerificationCode();
+        // 将邮箱与验证码绑定 存入Redis 并发送邮件
+        verificationCodeService.storeVerificationCode(email, verificationCode);
+        emailService.sendVerificationEmail(email, "Verification Code", verificationCode);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/verify")
     public String verify(@RequestBody UserVerifyRequest userVerifyRequest, RedirectAttributes redirectAttributes){
         String email = userVerifyRequest.getMail();
@@ -98,6 +115,15 @@ public class UserController {
             // 验证成功 更新用户状态 删除验证码 重定向到登录页面 并提示成功
             userService.markUserAsVerified(email);
             verificationCodeService.deleteVerificationCode(email);
+            /**
+             * 这段代码是在用户进行账号验证后，验证成功后跳转到登录页面的功能实现代码。
+             * 在验证成功后，会将一个名为"message"，值为"Verification successful"的属性加入到Flash Attribute中，
+             * 然后通过重定向方式跳转到登录页面。Flash Attribute是一种特殊的attribute，用于在两个请求之间传递数据。
+             * 这种方式可以在重定向时把数据放入到session中，然后在重定向后的页面中立即取出并使用，而不是在URL中暴露数据。
+             *
+             * 前端接收到"redirect:/login"时，会向服务器发出新的请求，请求/login接口，然后跳转到登录页面。而在登录页面中，
+             * 可以通过EL表达式取出之前加入到Flash Attribute中的"message"属性值，以供页面展示使用。
+             */
             redirectAttributes.addFlashAttribute("message", "Verification successful");
             return "redirect:/login";
         } else {

@@ -37,6 +37,13 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
         return storedCode != null && storedCode.equals(submittedCode);
     }
 
+    public String generateVerificationCode() {
+        int min = 100000;
+        int max = 999999;
+        int code = (int) (Math.random() * (max - min) + min);
+        return String.valueOf(code);
+    }
+
     /**
      * 删除验证码
      * @param email 邮箱
