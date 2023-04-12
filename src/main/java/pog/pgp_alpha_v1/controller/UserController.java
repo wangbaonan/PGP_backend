@@ -72,6 +72,14 @@ public class UserController {
             return null;
         }
         User user = userService.userLogin(userAccount, userPassword, request);
+        if(user == null){
+            // 用户名或密码错误
+            return ResultUtils.error(ErrorCode.USER_LOGIN_ERROR);
+        }
+        else if (user.getUserVerify().equals(0)) {
+            // 用户未激活
+            return ResultUtils.error(ErrorCode.USER_NOT_ACTIVATED);
+        }
         return ResultUtils.success(user);
     }
 
@@ -114,6 +122,12 @@ public class UserController {
         return ResultUtils.success(VERIFY_CODE_EMAIL_SEND_SUCCESS);
     }
 
+    /**
+     * 验证用户邮箱
+     * @param userVerifyRequest 用户邮箱和验证码
+     * @param redirectAttributes 重定向属性
+     * @return 成功后重定向到登录页面 失败则返回错误信息且跳转至验证页面
+     */
     @PostMapping("/verify")
     public String verify(@RequestBody UserVerifyRequest userVerifyRequest, RedirectAttributes redirectAttributes){
         String email = userVerifyRequest.getMail();
@@ -139,6 +153,11 @@ public class UserController {
         }
     }
 
+    /**
+     * 获取当前用户信息
+     * @param request HttpServletRequest
+     * @return User
+     */
     @GetMapping("/current")
     public BaseResponse<User> getCurrentUser(HttpServletRequest request) {
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
@@ -153,6 +172,11 @@ public class UserController {
         return ResultUtils.success(safetyUser);
     }
 
+    /**
+     * 用户登出
+     * @param request HttpServletRequest
+     * @return int
+     */
     @PostMapping("/logout")
     public BaseResponse<Integer> userLogout(HttpServletRequest request) {
         if (request == null) {

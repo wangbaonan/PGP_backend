@@ -122,7 +122,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 用户未激活
         if (user.getUserVerify().equals(0)) {
             log.info("User Login failed, user account : " + userAccount + " is not verified!");
-            return null;
+            return user;
         }
 
         // 获取数据库中的 SHA-256 + 随机盐值的密码 利用passwordEncoder方法匹配用户输入的密码与数据库中加密的密码
@@ -178,6 +178,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safetyUser.setUsername(user.getUsername());
         safetyUser.setCreateTime(user.getCreateTime());
         safetyUser.setUserRole(user.getUserRole());
+        safetyUser.setUserVerify(user.getUserVerify());
 
         return safetyUser;
     }
