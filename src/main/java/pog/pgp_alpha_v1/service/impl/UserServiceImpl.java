@@ -125,7 +125,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         String encodedPassword = user.getUserPassword();
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         boolean matches = passwordEncoder.matches(userPassword, encodedPassword);
-        if (matches){
+        if (matches) {
             // 用户脱敏
             User safetyUser = new User();
             safetyUser.setId(user.getId());
@@ -138,13 +138,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
             // 记录用户的登录态 Session
             // 单个服务器登录 如果是分布式登录改成Redis
-            request.getSession().setAttribute(USER_LOGIN_STATE,safetyUser);
+            request.getSession().setAttribute(USER_LOGIN_STATE, safetyUser);
             return safetyUser;
         }
         return null;
     }
 
+    @Override
+    public boolean markUserAsVerified(String email) {
+        if (StringUtils.isBlank(email)) {
+            return false;
+        }
+        // 校验邮箱格式
+        if (!Pattern.matches(EMAIL_REGEX, email)) {
+            return false;
+        }
+        // 利用Mapper查询需要使用QueryWrapper
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("mail", email);
+        User user = userMapper.selectOne(queryWrapper);
+        if (user != null) {
+            user.setUserVerify(1);
+            return this.updateById(user);
+        }
+        return false;
+    }
 }
+
 
 
 

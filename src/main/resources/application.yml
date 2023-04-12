@@ -1,4 +1,5 @@
 spring:
+  # Application Config
   application:
     name: pgp-userCenter
   # DataSource Config
@@ -7,8 +8,23 @@ spring:
     url: jdbc:mysql://localhost:3306/pgp
     username: root
     password: 110680100029wbn
+  # Mail Config
+  mail:
+    host: smtp.163.com
+    port: 25
+    username: wangbaonandlut@163.com
+    password: NYVJSZHWLOQIYFYT
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 server:
   port: 8080
+
+# Mybatis Plus Config
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false
@@ -17,17 +33,8 @@ mybatis-plus:
       logic-delete-field: isDelete # 全局逻辑删除的实体字段名
       logic-delete-value: 1 # 逻辑已删除值
       logic-not-delete-value: 0 # 逻辑未删除值
+
+# Redis Config
 redis:
   host: localhost
   port: 6379
-mail:
-  host: smtp.exmail.qq.com
-  port: 465
-  username: 21212030012@m.fudan.edu.cn
-  password: Wangbaonan1
-  properties:
-    mail:
-      smtp:
-        auth: true
-        starttls:
-          enable: true

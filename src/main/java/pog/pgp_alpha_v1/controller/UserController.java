@@ -3,10 +3,13 @@ package pog.pgp_alpha_v1.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pog.pgp_alpha_v1.model.User;
 import pog.pgp_alpha_v1.model.request.UserLoginRequest;
 import pog.pgp_alpha_v1.model.request.UserRegisterRequest;
+import pog.pgp_alpha_v1.model.request.UserVerifyRequest;
 import pog.pgp_alpha_v1.service.UserService;
+import pog.pgp_alpha_v1.service.VerificationCodeService;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +29,8 @@ public class UserController {
 
     @Resource
     private UserService userService;
+    @Resource
+    private VerificationCodeService verificationCodeService;
 
     @PostMapping("/register")
     public Long userRegister(@RequestBody UserRegisterRequest userRegisterRequest){
@@ -85,6 +90,22 @@ public class UserController {
         return userService.removeById(id);
     }
 
+    @PostMapping("/verify")
+    public String verify(@RequestBody UserVerifyRequest userVerifyRequest, RedirectAttributes redirectAttributes){
+        String email = userVerifyRequest.getMail();
+        String submittedCode = userVerifyRequest.getVerificationCode();
+        if (verificationCodeService.verifyCode(email, submittedCode)) {
+            // 验证成功 更新用户状态 删除验证码 重定向到登录页面 并提示成功
+            userService.markUserAsVerified(email);
+            verificationCodeService.deleteVerificationCode(email);
+            redirectAttributes.addFlashAttribute("message", "Verification successful");
+            return "redirect:/login";
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Invalid verification code");
+            return "redirect:/verification";
+        }
+    }
+
     /**
      * 鉴权 是否为管理员
      * @param request HttpServletRequest
@@ -94,6 +115,6 @@ public class UserController {
         // 鉴权
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User user = (User) userObj;
-        return user != null && user.getUserRole() == ADMIN_ROLE;
+        return user != null && user.getUserRole().equals(ADMIN_ROLE);
     }
 }

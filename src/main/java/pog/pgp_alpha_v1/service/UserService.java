@@ -33,4 +33,6 @@ public interface UserService extends IService<User> {
      * @return 返回脱敏后的用户信息
      */
     User userLogin(String userAccount, String userPassword, HttpServletRequest request);
+
+    boolean markUserAsVerified(String email);
 }

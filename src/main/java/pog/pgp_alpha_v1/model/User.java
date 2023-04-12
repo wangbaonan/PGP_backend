@@ -20,7 +20,7 @@ public class User implements Serializable {
     private Long id;
 
     /**
-     * 帐号
+     * 账号
      */
     private String userAccount;
 
@@ -64,6 +64,11 @@ public class User implements Serializable {
      * 角色
      */
     private Integer userRole;
+    
+    /**
+     * 邮箱验证通过
+     */
+    private Integer userVerify;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

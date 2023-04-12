@@ -15,12 +15,13 @@
             <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
             <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
             <result property="userRole" column="userRole" jdbcType="INTEGER"/>
+            <result property="userVerify" column="userVerify" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,userAccount,userPassword,
         mail,userStatus,username,
         createTime,updateTime,isDelete,
-        userRole
+        userRole,userVerify
     </sql>
 </mapper>

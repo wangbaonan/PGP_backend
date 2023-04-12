@@ -20,6 +20,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
      */
     @Override
     public void storeVerificationCode(String email, String verificationCode) {
+        // 10分钟过期
         stringRedisTemplate.opsForValue().set(email, verificationCode, 10, TimeUnit.MINUTES);
     }
 
@@ -31,6 +32,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
      */
     @Override
     public boolean verifyCode(String email, String submittedCode) {
+        // 获取存储的验证码
         String storedCode = stringRedisTemplate.opsForValue().get(email);
         return storedCode != null && storedCode.equals(submittedCode);
     }
@@ -41,6 +43,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
      */
     @Override
     public void deleteVerificationCode(String email) {
+        // 删除验证码
         stringRedisTemplate.delete(email);
     }
 }
