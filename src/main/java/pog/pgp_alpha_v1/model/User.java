@@ -7,8 +7,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- *
- * @TableName user
+ * &#064;Entity  pog.pgp_alpha_v1.model.User
  */
 @TableName(value ="user")
 @Data

@@ -20,6 +20,10 @@ spring:
           auth: true
           starttls:
             enable: true
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 1024MB
 server:
   port: 8080
 
@@ -29,9 +33,20 @@ mybatis-plus:
     map-underscore-to-camel-case: false
   global-config:
     db-config:
-      logic-delete-field: isDelete # 全局逻辑删除的实体字段名
-      logic-delete-value: 1 # 逻辑已删除值
-      logic-not-delete-value: 0 # 逻辑未删除值
+      # 全局逻辑删除的实体字段名
+      logic-delete-field: isDelete
+      # 逻辑删除的值（默认为 1）
+      logic-delete-value: 1
+      # 逻辑未删除的值（默认为 0）
+      logic-not-delete-value: 0
+
+my-app:
+  upload:
+    # 上传路径
+    uploadPath: G:\PGP_Dev\PGP_ProjectPath\userDataPath
+    # 分片大小
+    uploadChunkSize: #{5 * 1024 * 1024}
+
 
 # Redis Config
 redis:

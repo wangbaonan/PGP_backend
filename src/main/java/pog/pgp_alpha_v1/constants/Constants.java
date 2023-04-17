@@ -62,4 +62,5 @@ public class Constants {
     public static final String  VERIFY_CODE_EMAIL_SEND_SUCCESS = "Verification code email sent successfully!";
 
     public static final String  LOGOUT_SUCCESS = "Logout successfully!";
+    public static final String  UPLOAD_SUCCESS = "Upload successfully!";
 }

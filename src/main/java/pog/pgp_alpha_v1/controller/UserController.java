@@ -28,6 +28,7 @@ import static pog.pgp_alpha_v1.constants.Constants.*;
  * 用户接口
  * @author Wangbaonan
  */
+//@Api(tags = "User Management")
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -39,8 +40,9 @@ public class UserController {
     @Resource
     private EmailService emailService;
 
+    //@ApiOperation(value = "Register", response = BaseResponse.class)
     @PostMapping("/register")
-    public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest){
+    public BaseResponse userRegister(@RequestBody UserRegisterRequest userRegisterRequest){
         if(userRegisterRequest == null){
             return ResultUtils.error(ErrorCode.PARAMS_ERROR);
         }
@@ -58,8 +60,10 @@ public class UserController {
         return ResultUtils.success(result);
     }
 
+    // TODO 取消了BaseResponse的<>泛型，未验证是否会出现问题
+    //@ApiOperation(value = "Login", response = BaseResponse.class)
     @PostMapping("/login")
-    public BaseResponse<User> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request){
+    public BaseResponse userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request){
         if(userLoginRequest == null){
             return ResultUtils.error(ErrorCode.PARAMS_ERROR);
         }
@@ -82,7 +86,7 @@ public class UserController {
         }
         return ResultUtils.success(user);
     }
-
+    //@ApiOperation(value = "Search", response = BaseResponse.class)
     @GetMapping("/search")
     public BaseResponse<List<User>> searchUsers(String username, HttpServletRequest request){
         if(isAdmin(request)){
@@ -97,6 +101,7 @@ public class UserController {
         return ResultUtils.success(list);
     }
 
+    //@ApiOperation(value = "Delete", response = BaseResponse.class)
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteUser(@RequestBody long id, HttpServletRequest request){
         if(!isAdmin(request)){
@@ -110,6 +115,7 @@ public class UserController {
         return ResultUtils.success(deleteFlag);
     }
 
+    //@ApiOperation(value = "Send verification code", response = BaseResponse.class)
     @PostMapping("/sendVerificationCode")
     public BaseResponse<String> sendVerificationCode(@RequestBody UserSendVerifyCodeRequest userSendVerifyCodeRequest) {
         // 获取邮箱
@@ -128,6 +134,7 @@ public class UserController {
      * @param redirectAttributes 重定向属性
      * @return 成功后重定向到登录页面 失败则返回错误信息且跳转至验证页面
      */
+    //@ApiOperation(value = "Verify user's code", response = BaseResponse.class)
     @PostMapping("/verify")
     public String verify(@RequestBody UserVerifyRequest userVerifyRequest, RedirectAttributes redirectAttributes){
         String email = userVerifyRequest.getMail();
@@ -158,6 +165,7 @@ public class UserController {
      * @param request HttpServletRequest
      * @return User
      */
+    //@ApiOperation(value = "Get current user", response = BaseResponse.class)
     @GetMapping("/current")
     public BaseResponse<User> getCurrentUser(HttpServletRequest request) {
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
@@ -177,6 +185,7 @@ public class UserController {
      * @param request HttpServletRequest
      * @return int
      */
+    //@ApiOperation(value = "Logout", response = BaseResponse.class)
     @PostMapping("/logout")
     public BaseResponse<String> userLogout(HttpServletRequest request) {
         if (request == null) {

@@ -42,6 +42,8 @@ public class ResultUtils {
      * 失败
      *
      * @param errorCode 错误码
+     * @param message 错误信息
+     * @param description 错误描述
      * @return BaseResponse
      */
     public static BaseResponse error(ErrorCode errorCode, String message, String description) {
@@ -52,6 +54,7 @@ public class ResultUtils {
      * 失败
      *
      * @param errorCode 错误码
+     * @param description 错误描述
      * @return BaseResponse
      */
     public static BaseResponse error(ErrorCode errorCode, String description) {
