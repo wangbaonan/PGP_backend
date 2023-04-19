@@ -3,12 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <title>Verification Email</title>
+    <style>
+        .verification-code {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            font-family: Arial, sans-serif;
+            font-size: 40px;
+            letter-spacing: 10px;
+        }
+
+        .verification-code span {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            border: 3px solid #ccc;
+            border-radius: 10px;
+            text-align: center;
+            line-height: 60px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        p {
+            font-size: 18px;
+        }
+    </style>
 </head>
 <body>
 <p>Dear User,</p>
-<p>Thank you for registering on PGP. To complete the registration process, please enter the following verification code:</p>
-<p th:text="${verificationCode}"></p>
-<p>Best Regards,</p>
-<p>PGP FDU</p>
+<p style="font-size: 24px;">Thank you for registering on PGP. To complete the registration process, please enter the following verification code:</p>
+<div class="verification-code">
+    <span th:text="${verificationCode.charAt(0)}"></span>
+    <span th:text="${verificationCode.charAt(1)}"></span>
+    <span th:text="${verificationCode.charAt(2)}"></span>
+    <span th:text="${verificationCode.charAt(3)}"></span>
+    <span th:text="${verificationCode.charAt(4)}"></span>
+    <span th:text="${verificationCode.charAt(5)}"></span>
+</div>
+<p style="font-size: 18px;">Best Regards,</p>
+<p style="font-size: 18px;">PGP FDU</p>
 </body>
 </html>

@@ -63,4 +63,5 @@ public class Constants {
 
     public static final String  LOGOUT_SUCCESS = "Logout successfully!";
     public static final String  UPLOAD_SUCCESS = "Upload successfully!";
+    public static final String  SAVE_ERROR = "A file with the same MD5Hash value already exists.";
 }

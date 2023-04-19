@@ -15,7 +15,9 @@ public enum ErrorCode {
     USER_NOT_ACTIVATED(40002, "用户未激活", ""),
     USER_LOGIN_ERROR(40003, "用户名或密码错误", ""),
     //文件已存在
-    FILE_EXIST(40004, "文件已存在", "");
+    FILE_EXIST(40004, "文件已存在", ""),
+    //文件上传失败
+    FILE_UPLOAD_ERROR(40005, "文件上传失败", "");
 
 
     private final int code;
