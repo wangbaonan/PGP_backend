@@ -107,10 +107,11 @@ public class BigFileController {
         Long userId = currentUser.getId();
         // 保存上传文件信息，保存文件路径，即文件信息与用户信息关联起来了
         // 如果md5已经存在，就不再保存
-        boolean saveFlag = sampleDataService.saveUploadFile(mergeFileDir.getPath(), fileName, sampleId, userId, fileMd5);
-        if (!saveFlag) {
+        // 返回保存的数据id
+        Long dataId = sampleDataService.saveUploadFile(mergeFileDir.getPath(), fileName, sampleId, userId, fileMd5);
+        if (dataId == null) {
             logger.warn("文件已存在于数据库中，不再保存");
         }
-        return ResultUtils.success(mergeFileDir);
+        return ResultUtils.success(dataId);
     }
 }

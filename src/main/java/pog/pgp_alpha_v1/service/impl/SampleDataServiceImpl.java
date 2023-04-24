@@ -1,10 +1,14 @@
 package pog.pgp_alpha_v1.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import pog.pgp_alpha_v1.model.SampleData;
-import pog.pgp_alpha_v1.service.SampleDataService;
-import pog.pgp_alpha_v1.mapper.SampleDataMapper;
 import org.springframework.stereotype.Service;
+import pog.pgp_alpha_v1.mapper.SampleDataMapper;
+import pog.pgp_alpha_v1.model.SampleData;
+import pog.pgp_alpha_v1.model.User;
+import pog.pgp_alpha_v1.service.SampleDataService;
+
+import java.util.ArrayList;
 
 /**
 * @author 86183
@@ -14,9 +18,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class SampleDataServiceImpl extends ServiceImpl<SampleDataMapper, SampleData>
     implements SampleDataService{
+
     @Override
-    public boolean saveUploadFile(String filePath, String fileName, String sampleId, Long userId, String md5Hash) {
-        pog.pgp_alpha_v1.model.SampleData sampleData = new pog.pgp_alpha_v1.model.SampleData();
+    public Long saveUploadFile(String filePath, String fileName, String sampleId, Long userId, String md5Hash) {
+        SampleData sampleData = new SampleData();
         sampleData.setFilePath(filePath);
         sampleData.setFileName(fileName);
         sampleData.setSampleId(sampleId);
@@ -25,9 +30,27 @@ public class SampleDataServiceImpl extends ServiceImpl<SampleDataMapper, SampleD
         // 如果md5已经存在，就不再保存
         if (this.getOne(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<pog.pgp_alpha_v1.model.SampleData>().eq("md5Hash", md5Hash)) == null){
             this.save(sampleData);
-            return true;
+            return sampleData.getDataId();
         }
-        return false;
+        return null;
+    }
+
+    @Override
+    public SampleData getSampleData(Long dataId, User user) {
+        QueryWrapper<SampleData> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("dataId",dataId);
+        queryWrapper.eq("userId",user.getId());
+        return this.getOne(queryWrapper);
+    }
+
+    @Override
+    public ArrayList<SampleData> getSampleDataByUser(User user) {
+        // 从session中获取用户信息
+        Long userId = user.getId();
+        QueryWrapper<SampleData> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userId", userId);
+        ArrayList<SampleData> sampleDataArrayList = (ArrayList<SampleData>) this.list(queryWrapper);
+        return sampleDataArrayList;
     }
 }
 

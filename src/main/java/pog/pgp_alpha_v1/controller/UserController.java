@@ -41,6 +41,12 @@ public class UserController {
     private EmailService emailService;
 
     //@ApiOperation(value = "Register", response = BaseResponse.class)
+
+    /**
+     * 用户注册
+     * @param userRegisterRequest 用户注册请求体
+     * @return 用户信息
+     */
     @PostMapping("/register")
     public BaseResponse userRegister(@RequestBody UserRegisterRequest userRegisterRequest){
         if(userRegisterRequest == null){
@@ -62,6 +68,13 @@ public class UserController {
 
     // TODO 取消了BaseResponse的<>泛型，未验证是否会出现问题
     //@ApiOperation(value = "Login", response = BaseResponse.class)
+
+    /**
+     * 用户登录
+     * @param userLoginRequest 用户登录请求体
+     * @param request 请求
+     * @return 用户信息
+     */
     @PostMapping("/login")
     public BaseResponse userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request){
         if(userLoginRequest == null){
@@ -87,6 +100,13 @@ public class UserController {
         return ResultUtils.success(user);
     }
     //@ApiOperation(value = "Search", response = BaseResponse.class)
+
+    /**
+     * 搜索用户
+     * @param username 用户名
+     * @param request 请求
+     * @return 用户列表
+     */
     @GetMapping("/search")
     public BaseResponse<List<User>> searchUsers(String username, HttpServletRequest request){
         if(isAdmin(request)){
@@ -102,6 +122,13 @@ public class UserController {
     }
 
     //@ApiOperation(value = "Delete", response = BaseResponse.class)
+
+    /**
+     * 删除用户
+     * @param id 用户id
+     * @param request 请求
+     * @return 成功返回true
+     */
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteUser(@RequestBody long id, HttpServletRequest request){
         if(!isAdmin(request)){
@@ -116,6 +143,12 @@ public class UserController {
     }
 
     //@ApiOperation(value = "Send verification code", response = BaseResponse.class)
+
+    /**
+     * 发送验证码
+     * @param userSendVerifyCodeRequest Request
+     * @return 成功返回成功信息
+     */
     @PostMapping("/sendVerificationCode")
     public BaseResponse<String> sendVerificationCode(@RequestBody UserSendVerifyCodeRequest userSendVerifyCodeRequest) {
         // 获取邮箱
