@@ -1,12 +1,17 @@
 package pog.pgp_alpha_v1.controller;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import pog.pgp_alpha_v1.common.BaseResponse;
 import pog.pgp_alpha_v1.common.ResultUtils;
 import pog.pgp_alpha_v1.model.User;
+import pog.pgp_alpha_v1.model.request.AnalysisConfigRequest;
 import pog.pgp_alpha_v1.model.request.DeleteAnalysisSampleRequest;
 import pog.pgp_alpha_v1.service.AnalysisSamplesService;
 import pog.pgp_alpha_v1.service.AnalysisService;
+import pog.pgp_alpha_v1.service.ConfigService;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +27,8 @@ public class AnalysisController {
 
     @Resource
     AnalysisSamplesService analysisSamplesService;
+    @Resource
+    ConfigService configService;
     /**
      * 创建分析
      * @param request 用于获取当前用户
@@ -34,6 +41,22 @@ public class AnalysisController {
             return new BaseResponse<>(-1, null, "用户未登录");
         }
         return ResultUtils.success(analysisService.createAnalysis(currentUser));
+    }
+
+    /**
+     * 运行分析
+     * @param analysisConfigRequest 分析配置
+     * @param request 用于获取当前用户
+     * @return 运行结果
+     */
+    @PostMapping("/run")
+    public BaseResponse runAnalysis(@RequestBody AnalysisConfigRequest analysisConfigRequest, HttpServletRequest request) {
+        User currentUser = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
+        if (currentUser == null) {
+            return new BaseResponse<>(-1, null, "用户未登录");
+        }
+        configService.updateConfig(analysisConfigRequest, analysisConfigRequest.getAnalysisId());
+        return ResultUtils.success(analysisService.runAnalysis(analysisConfigRequest.getAnalysisId(), currentUser.getId()));
     }
 
     /**

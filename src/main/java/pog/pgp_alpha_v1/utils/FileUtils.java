@@ -5,13 +5,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class FileUtil {
+public class FileUtils {
 
     /**
      * 创建硬链接
      *
      * @param sourceFilePath 源文件路径
-     * @param targetFilePath 目标文件路径（硬链接）
+     * @param targetDirPath 目标文件路径（硬链接）
      * @throws IOException 文件操作异常
      */
     public static void createHardLink(String sourceFilePath, String targetDirPath) throws IOException {
