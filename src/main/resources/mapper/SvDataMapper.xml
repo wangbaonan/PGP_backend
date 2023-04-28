@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pog.pgp_alpha_v1.mapper.SvDataMapper">
+
+    <resultMap id="BaseResultMap" type="pog.pgp_alpha_v1.model.SvData">
+            <id property="dataId" column="dataId" jdbcType="BIGINT"/>
+            <result property="fileName" column="fileName" jdbcType="VARCHAR"/>
+            <result property="sampleId" column="sampleId" jdbcType="VARCHAR"/>
+            <result property="userId" column="userId" jdbcType="BIGINT"/>
+            <result property="filePath" column="filePath" jdbcType="VARCHAR"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+            <result property="md5Hash" column="md5Hash" jdbcType="CHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        dataId,fileName,sampleId,
+        userId,filePath,isDelete,
+        md5Hash
+    </sql>
+</mapper>
