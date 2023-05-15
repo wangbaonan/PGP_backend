@@ -1,2 +1,2 @@
-# PGP_backend betaV1
+# PGP_backend AlphaV2
 The Back-end of the PGP(Personal Genome Project) developed by SpringBoot
