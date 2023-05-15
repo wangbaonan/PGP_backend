@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pog.pgp_alpha_v1.common.BaseResponse;
 import pog.pgp_alpha_v1.common.ResultUtils;
+import pog.pgp_alpha_v1.model.User;
 import pog.pgp_alpha_v1.model.request.MultipartFileRequest;
 import pog.pgp_alpha_v1.service.SvDataService;
 import pog.pgp_alpha_v1.utils.UploadUtils;
@@ -15,6 +16,7 @@ import pog.pgp_alpha_v1.utils.UploadUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 
+import static pog.pgp_alpha_v1.constants.Constants.USER_LOGIN_STATE;
 import static pog.pgp_alpha_v1.utils.UploadUtils.getCurrentUserId;
 import static pog.pgp_alpha_v1.utils.UploadUtils.mergeFile;
 
@@ -52,4 +54,12 @@ public class SvFileController {
         svDataService.saveUploadFile(dataId, mergeFileDir.getPath(), fileName, sampleId, userId, fileMd5);
         return ResultUtils.success(dataId);
     }
+
+    //获取文件列表
+    @PostMapping(value = "/list")
+    public BaseResponse getFileList(HttpServletRequest httpServletRequest) {
+        User currentUser = (User) httpServletRequest.getSession().getAttribute(USER_LOGIN_STATE);
+        return ResultUtils.success(svDataService.getSvDataList(currentUser));
+    }
+
 }

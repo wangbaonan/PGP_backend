@@ -38,6 +38,7 @@ public class Analysis implements Serializable {
     /**
      * 完成时间
      */
+    @TableField(value = "updateTime", update = "NOW()")
     private Date updateTime;
 
     /**

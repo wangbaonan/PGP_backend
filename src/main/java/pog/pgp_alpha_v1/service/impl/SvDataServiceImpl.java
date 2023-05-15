@@ -5,7 +5,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import pog.pgp_alpha_v1.mapper.SvDataMapper;
 import pog.pgp_alpha_v1.model.SvData;
+import pog.pgp_alpha_v1.model.User;
 import pog.pgp_alpha_v1.service.SvDataService;
+
+import java.util.ArrayList;
 
 /**
 * @author 86183
@@ -25,13 +28,27 @@ public class SvDataServiceImpl extends ServiceImpl<SvDataMapper, SvData>
         svData.setUserId(userId);
         svData.setFileName(fileName);
         svData.setMd5Hash(md5Hash);
-        // 如果md5已经存在，就不再保存
-        if (this.getOne(new QueryWrapper<SvData>().eq("md5Hash", md5Hash)) == null){
-            this.save(svData);
-            return svData.getDataId();
-        }
-        return null;
+        // 如果md5已经存在，也需要保存，和DataId一样，不同用户可能上传相同的文件
+        this.save(svData);
+        return svData.getDataId();
     }
+
+    @Override
+    public SvData getSvData(Long dataId, User user) {
+        QueryWrapper<SvData> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("dataId",dataId);
+        queryWrapper.eq("userId",user.getId());
+        return this.getOne(queryWrapper);
+    }
+
+    @Override
+    public ArrayList<SvData> getSvDataList(User user) {
+        QueryWrapper<SvData> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userId",user.getId());
+        return (ArrayList<SvData>) this.list(queryWrapper);
+    }
+
+
 }
 
 

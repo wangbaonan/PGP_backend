@@ -1,8 +1,12 @@
 package pog.pgp_alpha_v1.config;
 
 import lombok.Data;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 @Data
+@Configuration
+@EnableAsync
 public class AnalysisConfig {
     private String suffix = "vcf.gz";
     private String assemblyVersion = "GRCh38";
@@ -27,7 +31,8 @@ public class AnalysisConfig {
     private String svAnnoDB = "pggsv,dbVar,DGV";
     private double svOverlapPer = 0.5;
     private int svGeneAnnoFlag = 1;
-    private int Thread = 6;
+    private int thread = 6;
+    private int moduleSwitchCode = 1022;
 
     public String toFormattedString(){
         return "suffix = " + suffix + "\n" +
@@ -53,7 +58,8 @@ public class AnalysisConfig {
                 "svAnnoDB = " + svAnnoDB + "\n" +
                 "svOverlapPer = " + svOverlapPer + "\n" +
                 "svGeneAnnoFlag = " + svGeneAnnoFlag + "\n" +
-                "Thread = " + Thread + "\n";
+                "Thread = " + thread + "\n" +
+                "module = " + moduleSwitchCode + "\n";
     }
 
 }

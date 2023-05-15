@@ -1,11 +1,13 @@
 package pog.pgp_alpha_v1.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.scheduling.annotation.Async;
 import pog.pgp_alpha_v1.model.Analysis;
 import pog.pgp_alpha_v1.model.User;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 
 /**
 * @author 86183
@@ -38,18 +40,23 @@ public interface AnalysisService extends IService<Analysis> {
     /**
      * 运行分析
      * @param analysisId 分析ID
-     * @param userId 用户ID
      * @return 是否运行成功
      */
-    boolean runAnalysis(Long analysisId, Long userId);
+    @Async
+    CompletableFuture<Boolean> runAnalysis(Long analysisId, User currentUser, int moduleSwitchCode);
 
     /**
      * 启动分析
-     * @param command 命令
+     * @param processBuilder 进程构建器
      * @param analysis 分析
      * @return 是否启动成功
      */
-    boolean startProcess(String command, Analysis analysis);
+    @Async
+    CompletableFuture<Boolean> startProcess(ProcessBuilder processBuilder, Analysis analysis);
 
+    @Async
     void monitorPGPProcessFile(Path outputPath, Long userId, Long analysisId);
+
+    @Async
+    void waitForProcessAndUpdateStatus(Long analysisId, Analysis analysis, User currentUser, int moduleSwitchCode);
 }

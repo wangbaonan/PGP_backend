@@ -1,6 +1,7 @@
 package pog.pgp_alpha_v1.service.impl;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import pog.pgp_alpha_v1.config.AnalysisConfig;
 import pog.pgp_alpha_v1.model.request.AnalysisConfigRequest;
 import pog.pgp_alpha_v1.service.ConfigService;
@@ -11,10 +12,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+@Service
 public class ConfigServiceImpl implements ConfigService {
     @Resource
     private AnalysisConfig analysisConfig;
-    @Value("${myapp.analysis.analysisPath}")
+    @Value("${my-app.analysis.analysisPath}")
     private String analysisPath;
 
     @Override
@@ -23,6 +25,7 @@ public class ConfigServiceImpl implements ConfigService {
         analysisConfig.setSvGeneAnnoFlag(request.getSvGeneAnnoFlag());
         analysisConfig.setSvOverlapPer(request.getSvOverlapPer());
         analysisConfig.setThread(request.getThread());
+        analysisConfig.setModuleSwitchCode(request.getModuleSwitchCode());
         try {
             Path configPath = Paths.get(analysisPath , analysisId.toString(), "config");
             Files.createDirectories(configPath);

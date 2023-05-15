@@ -8,6 +8,7 @@ import pog.pgp_alpha_v1.common.BaseResponse;
 import pog.pgp_alpha_v1.common.ResultUtils;
 import pog.pgp_alpha_v1.model.User;
 import pog.pgp_alpha_v1.model.request.AddSamplesRequest;
+import pog.pgp_alpha_v1.model.request.SampleInfoRequest;
 import pog.pgp_alpha_v1.service.AnalysisSamplesService;
 import pog.pgp_alpha_v1.service.SampleDataService;
 
@@ -49,12 +50,13 @@ public class SampleController {
 
     /**
      * 获取样本信息
-     * @param dataId 数据ID
+     * @param sampleInfoRequest 样本ID信息
      * @param request 获取用户信息
      * @return 返回数据基本信息
      */
     @PostMapping("/info")
-    public BaseResponse getSamplesInfo(@RequestBody Long dataId, HttpServletRequest request){
+    public BaseResponse getSamplesInfo(@RequestBody SampleInfoRequest sampleInfoRequest, HttpServletRequest request){
+        Long dataId = sampleInfoRequest.getDataId();
         User currentUser = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
         return ResultUtils.success(sampleDataService.getSampleData(dataId, currentUser));
     }

@@ -51,6 +51,7 @@ public class User implements Serializable {
     /**
      * 更新时间
      */
+    @TableField(value = "updateTime", update = "NOW()")
     private Date updateTime;
 
     /**

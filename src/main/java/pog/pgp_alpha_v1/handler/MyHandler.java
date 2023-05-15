@@ -1,5 +1,7 @@
 package pog.pgp_alpha_v1.handler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
@@ -20,6 +22,8 @@ public class MyHandler extends TextWebSocketHandler {
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final ApplicationEventPublisher eventPublisher;
 
+    private final Logger logger = LoggerFactory.getLogger(MyHandler.class);
+
     @Autowired
     public MyHandler(ApplicationEventPublisher eventPublisher) {
         this.eventPublisher = eventPublisher;
@@ -27,10 +31,20 @@ public class MyHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        String userId = session.getAttributes().get("userId").toString();
-        String analysisId = session.getAttributes().get("analysisId").toString();
-        String key = userId + "_" + analysisId;
-        sessions.put(key, session);
+        // String userId = session.getAttributes().get("userId").toString();
+        // String analysisId = session.getAttributes().get("analysisId").toString();
+        // String key = userId + "_" + analysisId;
+        String userId = session.getAttributes().get("userId") != null ? session.getAttributes().get("userId").toString() : null;
+        String analysisId = session.getAttributes().get("analysisId") != null ? session.getAttributes().get("analysisId").toString() : null;
+        logger.debug("userId = {}, analysisId = {}", userId, analysisId); // add this line
+        if (userId != null && analysisId != null) {
+            String key = userId + "_" + analysisId;
+            sessions.put(key, session);
+            logger.info("WebSocket connection established: userId = {}, analysisId = {}", userId, analysisId);
+        } else {
+            logger.error("WebSocket connection cannot be established due to missing userId or analysisId");
+            session.close(CloseStatus.BAD_DATA);
+        }
     }
 
     @Override
@@ -39,6 +53,7 @@ public class MyHandler extends TextWebSocketHandler {
         String analysisId = session.getAttributes().get("analysisId").toString();
         String key = userId + "_" + analysisId;
         sessions.remove(key);
+        logger.info("WebSocket connection closed: userId = {}, analysisId = {}", userId, analysisId);
     }
 
     public WebSocketSession getSessionByUserIdAndAnalysisId(Long userId, Long analysisId) {

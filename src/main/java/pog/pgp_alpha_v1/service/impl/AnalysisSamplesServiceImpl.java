@@ -7,9 +7,11 @@ import org.springframework.stereotype.Service;
 import pog.pgp_alpha_v1.mapper.AnalysisSamplesMapper;
 import pog.pgp_alpha_v1.model.AnalysisSamples;
 import pog.pgp_alpha_v1.model.SampleData;
+import pog.pgp_alpha_v1.model.SvData;
 import pog.pgp_alpha_v1.model.User;
 import pog.pgp_alpha_v1.service.AnalysisSamplesService;
 import pog.pgp_alpha_v1.service.SampleDataService;
+import pog.pgp_alpha_v1.service.SvDataService;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -33,6 +35,8 @@ public class AnalysisSamplesServiceImpl extends ServiceImpl<AnalysisSamplesMappe
     @Resource
     private SampleDataService sampleDataService;
     // 这部分逻辑需要在新建分析的时候就创建好，这里只需要将样本添加到分析中
+    @Resource
+    private SvDataService svDataService;
 
     /**
      * 将样本添加到分析中
@@ -58,9 +62,44 @@ public class AnalysisSamplesServiceImpl extends ServiceImpl<AnalysisSamplesMappe
             // 先创建分析文件夹，再将样本链接到分析文件夹中
             Path sampleTargetPath = Paths.get(analysisAllPath, analysisId.toString(), "input");
             Files.createDirectories(sampleTargetPath);
-            log.warn("Source:" + sampleSourceFilePath);
-            log.warn("Target" + sampleTargetPath);
+            String fileName = Paths.get(sampleSourceFilePath).getFileName().toString();
+            String sampleTargetFilePath = sampleTargetPath.resolve(fileName).toString();
+            log.warn("[SNP Source]: " + sampleSourceFilePath);
+            log.warn("[SNP Target]: " + sampleTargetFilePath);
             createHardLink(sampleSourceFilePath, sampleTargetPath.toString());
+            // Call tabix command for indexing the VCF file
+            String tabixCommand = "tabix";
+
+            // 检查sv_data数据库中是否存在dataId对应的数据
+            Long countSV = svDataService.count(new QueryWrapper<SvData>().eq("dataId", dataId));
+            // 如果存在，将dataId对应的sv数据硬链接到分析文件夹中，具体操作如下：
+            if (countSV != 0) {
+                // 在数据库中搜索dataId获取样本路径，并将样本硬链接到分析路径
+                SvData svData = svDataService.getSvData(dataId, user);
+                String svSourceFilePath = svData.getFilePath();
+                // 先创建分析文件夹，再将样本链接到分析文件夹中
+                Path svTargetPath = Paths.get(analysisAllPath, analysisId.toString(), "input","SV");
+                Files.createDirectories(svTargetPath);
+                String svFileName = Paths.get(svSourceFilePath).getFileName().toString();
+                String svTargetFilePath = svTargetPath.resolve(svFileName).toString();
+                log.warn("[SV Source]: " + svSourceFilePath);
+                log.warn("[SV Target]: " + svTargetFilePath);
+                createHardLink(svSourceFilePath, svTargetPath.toString());
+            }
+            ProcessBuilder processBuilder = new ProcessBuilder(tabixCommand, "-f", sampleTargetFilePath);
+            processBuilder.redirectErrorStream(true);
+
+            try {
+                Process process = processBuilder.start();
+                int exitCode = process.waitFor();
+                if (exitCode != 0) {
+                    // Handle the error case when tabix command fails
+                    log.error("Tabix command failed for file: " + sampleSourceFilePath);
+                }
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+
         }
         return true;
     }
@@ -85,10 +124,25 @@ public class AnalysisSamplesServiceImpl extends ServiceImpl<AnalysisSamplesMappe
             String sampleSourceFilePath = sample.getFilePath();
             Path sampleSourcePath = Paths.get(sampleSourceFilePath);
             String fileName = sampleSourcePath.getFileName().toString();
-            Path sampleTargetPath = Paths.get(analysisAllPath, analysisId.toString());
+            Path sampleTargetPath = Paths.get(analysisAllPath, analysisId.toString(), "input");
             // 从数据库中获取文件名，然后删除
             Path sampleTargetFilePath = Paths.get(sampleTargetPath.toString(), fileName);
+            // 将.tbi索引一并删除
+            Path sampleTargetFilePathIndex = Paths.get(sampleTargetPath.toString(), fileName + ".tbi");
+            log.warn("RemovePath : " + sampleTargetFilePath);
             sampleTargetFilePath.toFile().delete();
+            sampleTargetFilePathIndex.toFile().delete();
+            // 检查sv_data数据库中是否存在dataId对应的数据
+            // 同时删除SV文件的硬链接
+            SvData svData = svDataService.getSvData(dataId, user);
+            String svSourceFilePath = svData.getFilePath();
+            Path svSourcePath = Paths.get(svSourceFilePath);
+            String svFileName = svSourcePath.getFileName().toString();
+            Path svTargetPath = Paths.get(analysisAllPath, analysisId.toString(), "input","SV");
+            // 从数据库中获取文件名，然后删除
+            Path svTargetFilePath = Paths.get(svTargetPath.toString(), svFileName);
+            log.warn("RemovePath : " + svTargetFilePath);
+            svTargetFilePath.toFile().delete();
         }
         return true;
     }

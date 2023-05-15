@@ -9,10 +9,7 @@ import pog.pgp_alpha_v1.common.ErrorCode;
 import pog.pgp_alpha_v1.common.ResultUtils;
 import pog.pgp_alpha_v1.exception.BusinessException;
 import pog.pgp_alpha_v1.model.User;
-import pog.pgp_alpha_v1.model.request.UserLoginRequest;
-import pog.pgp_alpha_v1.model.request.UserRegisterRequest;
-import pog.pgp_alpha_v1.model.request.UserSendVerifyCodeRequest;
-import pog.pgp_alpha_v1.model.request.UserVerifyRequest;
+import pog.pgp_alpha_v1.model.request.*;
 import pog.pgp_alpha_v1.service.EmailService;
 import pog.pgp_alpha_v1.service.UserService;
 import pog.pgp_alpha_v1.service.VerificationCodeService;
@@ -125,20 +122,21 @@ public class UserController {
 
     /**
      * 删除用户
-     * @param id 用户id
+     * @param userDeleteRequest 请求体
      * @param request 请求
      * @return 成功返回true
      */
     @PostMapping("/delete")
-    public BaseResponse<Boolean> deleteUser(@RequestBody long id, HttpServletRequest request){
+    public BaseResponse<Boolean> deleteUser(@RequestBody UserDeleteRequest userDeleteRequest, HttpServletRequest request){
+        Long userId = userDeleteRequest.getUserId();
         if(!isAdmin(request)){
             throw new BusinessException(ErrorCode.NO_AUTH);
         }
-        if(id <= 0){
+        if(userId <= 0){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         // 逻辑删除
-        boolean deleteFlag = userService.removeById(id);
+        boolean deleteFlag = userService.removeById(userId);
         return ResultUtils.success(deleteFlag);
     }
 

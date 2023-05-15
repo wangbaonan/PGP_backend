@@ -6,7 +6,8 @@ import lombok.Data;
 public class AnalysisConfigRequest {
     private double svOverlapPer;
     private int svGeneAnnoFlag;
-    private int Thread;
+    private int thread;
     private String assemblyVersion;
     private Long analysisId;
+    private int moduleSwitchCode;
 }
