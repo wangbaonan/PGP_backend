@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pog.pgp_alpha_v1.mapper.AnalysisResultMapper">
+
+    <resultMap id="BaseResultMap" type="pog.pgp_alpha_v1.model.AnalysisResult">
+            <id property="analysisId" column="analysisId" jdbcType="BIGINT"/>
+            <result property="sampleId" column="sampleId" jdbcType="VARCHAR"/>
+            <result property="prs" column="prs" jdbcType="VARCHAR"/>
+            <result property="ancestry" column="ancestry" jdbcType="VARCHAR"/>
+            <result property="similarity" column="similarity" jdbcType="VARCHAR"/>
+            <result property="archaicSeg" column="archaicSeg" jdbcType="VARCHAR"/>
+            <result property="archaicSum" column="archaicSum" jdbcType="VARCHAR"/>
+            <result property="davidChartReport" column="davidChartReport" jdbcType="VARCHAR"/>
+            <result property="davidGeneClusterReport" column="davidGeneClusterReport" jdbcType="VARCHAR"/>
+            <result property="davidTermClusterReport" column="davidTermClusterReport" jdbcType="VARCHAR"/>
+            <result property="archaicPlot" column="archaicPlot" jdbcType="VARCHAR"/>
+            <result property="pca" column="pca" jdbcType="VARCHAR"/>
+            <result property="sv" column="sv" jdbcType="VARCHAR"/>
+            <result property="hla" column="hla" jdbcType="VARCHAR"/>
+            <result property="prsHtml" column="prsHtml" jdbcType="VARCHAR"/>
+            <result property="province" column="province" jdbcType="VARCHAR"/>
+            <result property="mty" column="mty" jdbcType="VARCHAR"/>
+            <result property="as2" column="as2" jdbcType="VARCHAR"/>
+            <result property="snpediaMedicine" column="snpediaMedicine" jdbcType="VARCHAR"/>
+            <result property="snpediaMedicalCondiction" column="snpediaMedicalCondiction" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        analysisId,sampleId,prs,
+        ancestry,similarity,archaicSeg,
+        archaicSum,davidChartReport,davidGeneClusterReport,
+        davidTermClusterReport,archaicPlot,pca,
+        sv,hla,prsHtml,
+        province,mty,as2,
+        snpediaMedicine,snpediaMedicalCondiction
+    </sql>
+</mapper>
