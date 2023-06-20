@@ -12,7 +12,7 @@ import java.util.ArrayList;
 * @createDate 2023-04-25 15:19:06
 */
 public interface SvDataService extends IService<SvData> {
-    Long saveUploadFile(Long dataId, String filePath, String fileName, String sampleId, Long userId, String md5Hash);
+    Long saveUploadFile(Long dataId, String filePath, String fileName, Long userId, String md5Hash);
     SvData getSvData(Long dataId, User user);
     ArrayList<SvData> getSvDataList(User user);
 }

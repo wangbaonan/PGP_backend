@@ -45,13 +45,12 @@ public class SvFileController {
         String fileMd5 = request.getParameter("fileMd5");
         String fileName = request.getParameter("fileName");
         String fileExt = request.getParameter("fileExt");
-        String sampleId = request.getParameter("sampleId");
         File mergeFileDir = mergeFile(fileMd5, fileName, fileExt, fileStorePath);
         // 将上传合并后的文件路径添加到数据库中
         Long userId =  getCurrentUserId(request);
         // 保存上传文件信息，保存文件路径，即文件信息与用户信息关联起来了
         // 如果md5已经存在，就不再保存
-        svDataService.saveUploadFile(dataId, mergeFileDir.getPath(), fileName, sampleId, userId, fileMd5);
+        svDataService.saveUploadFile(dataId, mergeFileDir.getPath(), fileName, userId, fileMd5);
         return ResultUtils.success(dataId);
     }
 

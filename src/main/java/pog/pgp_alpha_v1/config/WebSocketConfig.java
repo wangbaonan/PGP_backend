@@ -50,10 +50,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
                 .addInterceptors(interceptor)
                 .setAllowedOrigins("*");
     }
-
-
-
-
+    
     private Map<String, String> getQueryParameters(URI uri) {
         String query = uri.getQuery();
         Map<String, String> queryParameters = new HashMap<>();

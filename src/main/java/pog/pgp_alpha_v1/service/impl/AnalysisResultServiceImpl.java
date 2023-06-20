@@ -31,8 +31,8 @@ public class AnalysisResultServiceImpl extends ServiceImpl<AnalysisResultMapper,
         analysisResult.setSampleId(sampleId);
 
         if ((moduleSwitchCode & ADMIXTURE_SWITCH.getValue()) != 0) {
-            Path ancestryResPath = Paths.get(analysisAllPath + analysisId + "output" + sampleId + "Res_JSON" + "Admixture" + "ancestry.json");
-            Path similarityResPath = Paths.get(analysisAllPath + analysisId + "output" + sampleId + "Res_JSON" + "Admixture" + "similarity.ED.json");
+            Path ancestryResPath = Paths.get(analysisAllPath , String.valueOf(analysisId), "output" , sampleId , "Res_JSON" , "Admixture" , "ancestry.json");
+            Path similarityResPath = Paths.get(analysisAllPath , String.valueOf(analysisId), "output" , sampleId , "Res_JSON", "Admixture" , "similarity.ED.json");
             // 在analysis_result数据库中添加相应路径
             analysisResult.setAncestry(ancestryResPath.toString());
             analysisResult.setSimilarity(similarityResPath.toString());
@@ -42,12 +42,12 @@ public class AnalysisResultServiceImpl extends ServiceImpl<AnalysisResultMapper,
         }
 
         if ((moduleSwitchCode & AS2_SWITCH.getValue()) != 0) {
-            Path archaicSegPath = Paths.get(analysisAllPath + analysisId + "output" + sampleId + "Res_JSON" + "AS2" + "archaic.seg.json");
-            Path archaicSumPath = Paths.get(analysisAllPath + analysisId + "output" + sampleId + "Res_JSON" + "AS2" + "archaic.sum.json");
-            Path davidChartReportPath = Paths.get(analysisAllPath + analysisId + "output" + sampleId + "Res_JSON" + "AS2" + "david.anno.chartReport.json");
-            Path davidGeneClusterReportPath = Paths.get(analysisAllPath + analysisId + "output" + sampleId + "Res_JSON" + "AS2" + "david.anno.geneClusterReport.json");
-            Path davidTermClusterReportPath = Paths.get(analysisAllPath + analysisId + "output" + sampleId + "Res_JSON" + "AS2" + "david.anno.termClusteringReport.json");
-            Path archaicPlotPath = Paths.get(analysisAllPath + analysisId + "output" + sampleId + "Res_PNG" + "AS2" + "archaicChrPlot.svg");
+            Path archaicSegPath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_JSON" , "AS2" , "archaic.seg.json");
+            Path archaicSumPath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_JSON" , "AS2" , "archaic.sum.json");
+            Path davidChartReportPath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_JSON" , "AS2" , "david.anno.chartReport.json");
+            Path davidGeneClusterReportPath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_JSON" , "AS2" , "david.anno.geneClusterReport.json");
+            Path davidTermClusterReportPath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_JSON" , "AS2" , "david.anno.termClusteringReport.json");
+            Path archaicPlotPath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_PNG" , "AS2" , "archaicChrPlot.svg");
             analysisResult.setArchaicSeg(archaicSegPath.toString());
             analysisResult.setArchaicSum(archaicSumPath.toString());
             analysisResult.setDavidChartReport(davidChartReportPath.toString());
@@ -64,43 +64,43 @@ public class AnalysisResultServiceImpl extends ServiceImpl<AnalysisResultMapper,
         }
 
         if ((moduleSwitchCode & HLA_SWITCH.getValue()) != 0) {
-            Path hlaPath = Paths.get(analysisAllPath + analysisId + "output" + sampleId + "Res_JSON" + "HLA" + "HLA.json");
+            Path hlaPath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_JSON" , "HLA" , "HLA.json");
             analysisResult.setHla(hlaPath.toString());
         } else {
             analysisResult.setHla(null);
         }
 
         if ((moduleSwitchCode & MTY_SWITCH.getValue()) != 0) {
-            Path mtyPath = Paths.get(analysisAllPath + analysisId + "output" + sampleId + "Res_JSON" + "MT_Y" + "MT_Y.json");
+            Path mtyPath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_JSON" , "MT_Y" , "MT_Y.json");
             analysisResult.setMty(mtyPath.toString());
         } else {
             analysisResult.setMty(null);
         }
 
         if ((moduleSwitchCode & PCA_SWITCH.getValue()) != 0) {
-            Path pcaPath = Paths.get(analysisAllPath + analysisId + "output" + sampleId + "Res_JSON" + "PCA" + "PCA.json");
+            Path pcaPath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_JSON" , "PCA" , "PCA.json");
             analysisResult.setPca(pcaPath.toString());
         } else {
             analysisResult.setPca(null);
         }
 
         if ((moduleSwitchCode & PROVINCE_SWITCH.getValue()) != 0) {
-            Path provincePath = Paths.get(analysisAllPath + analysisId + "output" + sampleId + "Res_JSON" + "Province" + "province.json");
+            Path provincePath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_JSON" , "Province" , "province.json");
             analysisResult.setProvince(provincePath.toString());
         } else {
             analysisResult.setProvince(null);
         }
 
         if ((moduleSwitchCode & PRS_SWITCH.getValue()) != 0) {
-            Path prsPath = Paths.get(analysisAllPath + analysisId + "output" + sampleId + "Res_JSON" + "PRS" + "prs.json");
+            Path prsPath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_JSON" , "PRS" , "prs.json");
             analysisResult.setPrs(prsPath.toString());
         } else {
             analysisResult.setPrs(null);
         }
 
         if ((moduleSwitchCode & SNPEDIA_SWITCH.getValue()) != 0) {
-            Path snpediaMedicalCondictionPath = Paths.get(analysisAllPath + analysisId + "output" + sampleId + "Res_JSON" + "Snpedia" + "snpedia.medicalCondiction.json");
-            Path snpediaMedicinePath = Paths.get(analysisAllPath + analysisId + "output" + sampleId + "Res_JSON" + "Snpedia" + "snpedia.medicine.json");
+            Path snpediaMedicalCondictionPath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_JSON" , "Snpedia" , "snpedia.medicalCondiction.json");
+            Path snpediaMedicinePath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_JSON" , "Snpedia" , "snpedia.medicine.json");
             analysisResult.setSnpediaMedicalCondiction(snpediaMedicalCondictionPath.toString());
             analysisResult.setSnpediaMedicine(snpediaMedicinePath.toString());
         } else {
@@ -109,7 +109,7 @@ public class AnalysisResultServiceImpl extends ServiceImpl<AnalysisResultMapper,
         }
 
         if ((moduleSwitchCode & SV_SWITCH.getValue()) != 0) {
-            Path svPath = Paths.get(analysisAllPath + analysisId + "output" + sampleId + "Res_JSON" + "SV" + "sv.anno.json");
+            Path svPath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_JSON" , "SV" , "sv.anno.json");
             analysisResult.setSv(svPath.toString());
         } else {
             analysisResult.setSv(null);
@@ -122,103 +122,103 @@ public class AnalysisResultServiceImpl extends ServiceImpl<AnalysisResultMapper,
     @Override
     public String getPrsResultPath(Long analysisId, String sampleId) {
         // 获取analysis_result表中的prs字段
-        String prsPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysis_id", analysisId).eq("sample_id", sampleId)).getPrs();
+        String prsPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getPrs();
         return prsPath;
     }
 
     @Override
     public String getAncestryResultPath(Long analysisId, String sampleId) {
-        String ancestryPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysis_id", analysisId).eq("sample_id", sampleId)).getAncestry();
+        String ancestryPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getAncestry();
         return ancestryPath;
     }
 
     @Override
     public String getSimilarityResultPath(Long analysisId, String sampleId) {
-        String similarityPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysis_id", analysisId).eq("sample_id", sampleId)).getSimilarity();
+        String similarityPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getSimilarity();
         return similarityPath;
     }
 
     @Override
     public String getArchaicSegResultPath(Long analysisId, String sampleId) {
-        String archaicSegPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysis_id", analysisId).eq("sample_id", sampleId)).getArchaicSeg();
+        String archaicSegPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getArchaicSeg();
         return archaicSegPath;
     }
 
     @Override
     public String getArchaicSumResultPath(Long analysisId, String sampleId) {
-        String archaicSumPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysis_id", analysisId).eq("sample_id", sampleId)).getArchaicSum();
+        String archaicSumPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getArchaicSum();
         return archaicSumPath;
     }
 
     @Override
     public String getDavidChartReportResultPath(Long analysisId, String sampleId) {
-        String davidChartReportPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysis_id", analysisId).eq("sample_id", sampleId)).getDavidChartReport();
+        String davidChartReportPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getDavidChartReport();
         return davidChartReportPath;
     }
 
     @Override
     public String getDavidGeneClusterReportResultPath(Long analysisId, String sampleId) {
-        String davidGeneClusterReportPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysis_id", analysisId).eq("sample_id", sampleId)).getDavidGeneClusterReport();
+        String davidGeneClusterReportPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getDavidGeneClusterReport();
         return davidGeneClusterReportPath;
     }
 
     @Override
     public String getDavidTermClusterReportResultPath(Long analysisId, String sampleId) {
-        String davidTermClusterReportPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysis_id", analysisId).eq("sample_id", sampleId)).getDavidTermClusterReport();
+        String davidTermClusterReportPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getDavidTermClusterReport();
         return davidTermClusterReportPath;
     }
 
     @Override
     public String getArchaicPlotResultPath(Long analysisId, String sampleId) {
-        String archaicPlotPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysis_id", analysisId).eq("sample_id", sampleId)).getArchaicPlot();
+        String archaicPlotPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getArchaicPlot();
         return archaicPlotPath;
     }
 
     @Override
     public String getHlaResultPath(Long analysisId, String sampleId) {
-        String hlaPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysis_id", analysisId).eq("sample_id", sampleId)).getHla();
+        String hlaPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getHla();
         return hlaPath;
     }
 
     @Override
     public String getPrsHtmlResultPath(Long analysisId, String sampleId) {
-        String prsHtmlPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysis_id", analysisId).eq("sample_id", sampleId)).getPrsHtml();
+        String prsHtmlPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getPrsHtml();
         return prsHtmlPath;
     }
 
     @Override
     public String getMtyResultPath(Long analysisId, String sampleId) {
-        String mtyPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysis_id", analysisId).eq("sample_id", sampleId)).getMty();
+        String mtyPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getMty();
         return mtyPath;
     }
 
     @Override
     public String getPcaResultPath(Long analysisId, String sampleId) {
-        String pcaPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysis_id", analysisId).eq("sample_id", sampleId)).getPca();
+        String pcaPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getPca();
         return pcaPath;
     }
 
     @Override
     public String getProvinceResultPath(Long analysisId, String sampleId) {
-        String provincePath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysis_id", analysisId).eq("sample_id", sampleId)).getProvince();
+        String provincePath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getProvince();
         return provincePath;
     }
 
     @Override
     public String getSnpediaMedicalCondictionResultPath(Long analysisId, String sampleId) {
-        String snpediaMedicalCondictionPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysis_id", analysisId).eq("sample_id", sampleId)).getSnpediaMedicalCondiction();
+        String snpediaMedicalCondictionPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getSnpediaMedicalCondiction();
         return snpediaMedicalCondictionPath;
     }
 
     @Override
     public String getSnpediaMedicineResultPath(Long analysisId, String sampleId) {
-        String snpediaMedicinePath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysis_id", analysisId).eq("sample_id", sampleId)).getSnpediaMedicine();
+        String snpediaMedicinePath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getSnpediaMedicine();
         return snpediaMedicinePath;
     }
 
     @Override
     public String getSvResultPath(Long analysisId, String sampleId) {
-        String svPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysis_id", analysisId).eq("sample_id", sampleId)).getSv();
+        String svPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getSv();
         return svPath;
     }
 }

@@ -10,4 +10,5 @@ public class AnalysisConfigRequest {
     private String assemblyVersion;
     private Long analysisId;
     private int moduleSwitchCode;
+    private int gVCFRegionalCallingSwitch;
 }

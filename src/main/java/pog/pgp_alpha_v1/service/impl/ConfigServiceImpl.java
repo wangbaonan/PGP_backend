@@ -26,6 +26,7 @@ public class ConfigServiceImpl implements ConfigService {
         analysisConfig.setSvOverlapPer(request.getSvOverlapPer());
         analysisConfig.setThread(request.getThread());
         analysisConfig.setModuleSwitchCode(request.getModuleSwitchCode());
+        analysisConfig.setGVCFRegionalCallingSwitch(request.getGVCFRegionalCallingSwitch());
         try {
             Path configPath = Paths.get(analysisPath , analysisId.toString(), "config");
             Files.createDirectories(configPath);

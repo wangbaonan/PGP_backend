@@ -16,12 +16,11 @@ public interface SampleDataService extends IService<SampleData> {
      * 保存上传的文件
      * @param filePath 文件路径
      * @param fileName 文件名称
-     * @param sampleId 样本ID
      * @param userId 用户ID
      * @param md5Hash MD5
      * @return dataId
      */
-    Long saveUploadFile(String filePath, String fileName, String sampleId, Long userId, String md5Hash);
+    Long saveUploadFile(String filePath, String fileName, Long userId, String md5Hash);
 
     /**
      * 通过dataId获取样本数据

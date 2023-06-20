@@ -46,13 +46,12 @@ public class BigFileController {
         String fileMd5 = request.getParameter("fileMd5");
         String fileName = request.getParameter("fileName");
         String fileExt = request.getParameter("fileExt");
-        String sampleId = request.getParameter("sampleId");
         File mergeFileDir = mergeFile(fileMd5, fileName, fileExt, fileStorePath);
         Long userId =  getCurrentUserId(request);
         // 保存上传文件信息，保存文件路径，即文件信息与用户信息关联起来了
         // 如果md5已经存在，就不再保存
         // 返回保存的数据id
-        Long dataId = sampleDataService.saveUploadFile(mergeFileDir.getPath(), fileName, sampleId, userId, fileMd5);
+        Long dataId = sampleDataService.saveUploadFile(mergeFileDir.getPath(), fileName, userId, fileMd5);
         if (dataId == null) {
             logger.warn("文件已存在于数据库中，不再保存");
         }

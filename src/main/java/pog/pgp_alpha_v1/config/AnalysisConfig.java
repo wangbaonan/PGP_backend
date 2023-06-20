@@ -9,6 +9,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 public class AnalysisConfig {
     private String suffix = "vcf.gz";
+    private String suffixGVCF = "g.vcf.gz";
+    private int gVCFRegionalCallingSwitch = 0; // 默认是VCF模式
+    private String grch38callingsh = "/home/pogadmin/dev_PGP/02_genotypeGVCF/AAGC031921D/160.haplotypecaller.gVCF.mode/AAGC031921D/00_concat/01.gatkRegionalCalling.sh";
     private String assemblyVersion = "GRCh38";
     private String pcash = "/home/pogadmin/PersonalGenome/src/scripts/PCA/000.PCA.sh";
     private String admixturesh = "/home/pogadmin/PersonalGenome/src/scripts/Admixture/00.run.sh";
@@ -36,6 +39,9 @@ public class AnalysisConfig {
 
     public String toFormattedString(){
         return "suffix = " + suffix + "\n" +
+                "suffixGVCF = " + suffixGVCF + "\n" +
+                "gVCFRegionalCallingSwitch = " + gVCFRegionalCallingSwitch + "\n" +
+                "grch38callingsh = " + grch38callingsh + "\n" +
                 "assemblyVersion = " + assemblyVersion + "\n" +
                 "pcash = " + pcash + "\n" +
                 "admixturesh = " + admixturesh + "\n" +

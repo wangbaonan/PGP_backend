@@ -7,8 +7,7 @@ import pog.pgp_alpha_v1.model.User;
 import pog.pgp_alpha_v1.model.request.MultipartFileRequest;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.AbstractMap;
 import java.util.Map;
@@ -77,6 +76,35 @@ public class UploadUtils {
             return null;
         }
         return user.getId();
+    }
+
+    public static String getSampleId(String filePath){
+        String sampleId = null;
+
+        try {
+            // Run bcftools query -l command
+            ProcessBuilder pb = new ProcessBuilder("bcftools", "query", "-l", filePath);
+            Process p = pb.start();
+            p.waitFor();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            // Read sample ID from bcftools output
+            sampleId = reader.readLine();
+
+        } catch (IOException e) {
+            // Handle the situation when the IO operation fails, maybe log the exception and return or throw a runtime exception.
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // Handle the situation when the thread gets interrupted, maybe log the exception and return or throw a runtime exception.
+            e.printStackTrace();
+        }
+
+        // Ensure that sampleId was successfully retrieved
+        if (sampleId == null) {
+            // Handle this situation, maybe log an error and return or throw a runtime exception.
+            return null;
+        }
+        return sampleId;
     }
 
     public static Map.Entry<Long, File> mergeFileMap(HttpServletRequest request, String fileStorePath){

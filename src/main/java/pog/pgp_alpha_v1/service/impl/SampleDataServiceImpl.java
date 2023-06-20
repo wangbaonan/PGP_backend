@@ -10,6 +10,8 @@ import pog.pgp_alpha_v1.service.SampleDataService;
 
 import java.util.ArrayList;
 
+import static pog.pgp_alpha_v1.utils.UploadUtils.getSampleId;
+
 /**
  * @author 86183
  * @description 针对表【sample_data】的数据库操作Service实现
@@ -20,19 +22,19 @@ public class SampleDataServiceImpl extends ServiceImpl<SampleDataMapper, SampleD
         implements SampleDataService {
 
     @Override
-    public Long saveUploadFile(String filePath, String fileName, String sampleId, Long userId, String md5Hash) {
+    public Long saveUploadFile(String filePath, String fileName, Long userId, String md5Hash) {
+
+        String sampleId = getSampleId(filePath);
         SampleData sampleData = new SampleData();
         sampleData.setFilePath(filePath);
         sampleData.setFileName(fileName);
         sampleData.setSampleId(sampleId);
         sampleData.setUserId(userId);
         sampleData.setMd5Hash(md5Hash);
-        // 如果md5已经存在，就不再保存
-        if (this.getOne(new QueryWrapper<SampleData>().eq("md5Hash", md5Hash)) == null){
-            this.save(sampleData);
-            return sampleData.getDataId();
-        }
-        return null;
+        // 如果md5已经存在，也需要保存，和DataId一样，不同用户可能上传相同的文件
+        this.save(sampleData);
+        return sampleData.getDataId();
+
     }
 
     @Override

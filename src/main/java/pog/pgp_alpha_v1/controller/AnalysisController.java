@@ -1,19 +1,13 @@
 package pog.pgp_alpha_v1.controller;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pog.pgp_alpha_v1.common.BaseResponse;
 import pog.pgp_alpha_v1.common.ResultUtils;
 import pog.pgp_alpha_v1.model.User;
 import pog.pgp_alpha_v1.model.request.AnalysisConfigRequest;
 import pog.pgp_alpha_v1.model.request.AnalysisResultGetRequest;
 import pog.pgp_alpha_v1.model.request.DeleteAnalysisSampleRequest;
-import pog.pgp_alpha_v1.service.AnalysisResultService;
-import pog.pgp_alpha_v1.service.AnalysisSamplesService;
-import pog.pgp_alpha_v1.service.AnalysisService;
-import pog.pgp_alpha_v1.service.ConfigService;
+import pog.pgp_alpha_v1.service.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +27,10 @@ public class AnalysisController {
     ConfigService configService;
     @Resource
     AnalysisResultService analysisResultService;
-
+    @Resource
+    AlleleRegionFrequencyService alleleRegionFrequencyService;
+    @Resource
+    AllelePopulationFrequencyService allelePopulationFrequencyService;
     /**
      * 创建分析
      * @param request 用于获取当前用户
@@ -125,6 +122,16 @@ public class AnalysisController {
             return new BaseResponse<>(-1, null, "用户未登录");
         }
         return ResultUtils.success(analysisSamplesService.removeSamples(analysisId, dataIds, currentUser));
+    }
+
+    @GetMapping("/result/allelePopulationFrequencyData/{id}")
+    public BaseResponse getAllelePopulationFrequencyData(@PathVariable("id") String chrPosId){
+        return ResultUtils.success(allelePopulationFrequencyService.getById(chrPosId)); // like "chr10_102837723"
+    }
+
+    @GetMapping("/result/alleleRegionFrequencyData/{id}")
+    public BaseResponse getAlleleRegionFrequencyData(@PathVariable("id") String chrPosId){
+        return ResultUtils.success(alleleRegionFrequencyService.getById(chrPosId));
     }
 
     // 先检查用户与分析ID是否匹配，再查询结果路径
