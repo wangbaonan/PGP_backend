@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static pog.pgp_alpha_v1.common.ErrorCode.*;
 import static pog.pgp_alpha_v1.constants.Constants.*;
 
 /**
@@ -33,33 +34,41 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     private UserMapper userMapper;
 
     @Override
-    public long userRegister(String userAccount, String userPassword, String checkPassword, String email, String username) {
+    public Object userRegister(String userAccount, String userPassword, String checkPassword, String email, String username) {
         // 1.校验
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-            return -1;
+            return INPUT_BLANK;
         }
         // 校验账户名长度
         if (userAccount.length() < USERNAME_MAX_LENGTH) {
-            return -1;
+            return ACCOUNT_LENGTH_ERROR;
         }
         // 校验密码长度
         if (userPassword.length() < PASSWORD_MAX_LENGTH || checkPassword.length() < PASSWORD_MAX_LENGTH) {
-            return -1;
+            return PASSWORD_LENGTH_ERROR;
         }
         // 校验邮箱格式
         if ((email != null) && (!email.isEmpty())) {
+            // 判断邮箱格式
             if (!Pattern.matches(EMAIL_REGEX, email)) {
-                return -1;
+                return EMAIL_FORMAT_ERROR;
+            }
+            // 判断邮箱是否重复
+            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("mail", email);
+            long count = userMapper.selectCount(queryWrapper);
+            if (count > 0) {
+                return EMAIL_REPEAT_ERROR;
             }
         }
-        // 账户不能包含重复字符 正则表达式
+        // 账户不能包含特殊字符
         Matcher matcher = Pattern.compile(ACCOUNT_REGEX).matcher(userAccount);
         if (matcher.find()) {
-            return -1;
+            return ACCOUNT_REGEX_ERROR;
         }
         // 密码和校验密码相同
         if (!userPassword.equals(checkPassword)) {
-            return -1;
+            return PASSWORD_CHECK_ERROR;
         }
         // 账户不能重复
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -67,7 +76,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         queryWrapper.eq("userAccount", userAccount);
         long count = userMapper.selectCount(queryWrapper);
         if (count > 0) {
-            return -1;
+            return ACCOUNT_REPEAT_ERROR;
         }
 
         // 2.加密
@@ -85,7 +94,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setUsername(username);
         boolean saveFlag = this.save(user);
         if (!saveFlag) {
-            return -1;
+            return REGISTER_ERROR;
         }
         return user.getId();
     }
@@ -121,8 +130,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         // 用户未激活
         if (user.getUserVerify().equals(0)) {
-            log.info("User Login failed, user account : " + userAccount + " is not verified!");
-            return user;
+            // 当且仅当用户邮箱不为空时才提示用户未激活，否则直接登录
+            if (!StringUtils.isBlank(user.getMail())) {
+                log.info("User Login failed, user account : " + userAccount + " is not verified!");
+                return user;
+            }
         }
 
         // 获取数据库中的 SHA-256 + 随机盐值的密码 利用passwordEncoder方法匹配用户输入的密码与数据库中加密的密码
@@ -165,6 +177,40 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 移除登录态
         request.getSession().removeAttribute(USER_LOGIN_STATE);
         return 1;
+    }
+
+    @Override
+    public boolean isEmailRegistered(String email) {
+        if (StringUtils.isBlank(email)) {
+            return false;
+        }
+        // 校验邮箱格式
+        if (!Pattern.matches(EMAIL_REGEX, email)) {
+            return false;
+        }
+        // 利用Mapper查询需要使用QueryWrapper
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("mail", email);
+        long count = userMapper.selectCount(queryWrapper);
+        // count > 0 说明邮箱已经被注册
+        return count > 0;
+    }
+
+    @Override
+    public boolean isEmailVerified(String email) {
+        if (StringUtils.isBlank(email)) {
+            return false;
+        }
+        // 校验邮箱格式
+        if (!Pattern.matches(EMAIL_REGEX, email)) {
+            return false;
+        }
+        // 利用Mapper查询需要使用QueryWrapper
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("mail", email);
+        User user = userMapper.selectOne(queryWrapper);
+        // user != null 说明邮箱已经被注册
+        return user != null && user.getUserVerify().equals(1);
     }
 
 

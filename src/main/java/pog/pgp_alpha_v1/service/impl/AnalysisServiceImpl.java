@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
@@ -47,10 +48,14 @@ public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
     private ApplicationEventPublisher eventPublisher;
     @Resource
     private AnalysisResultService analysisResultService;
-    @Resource
     private AnalysisSamplesService analysisSamplesService;
     @Resource
     private SampleDataService sampleDataService;
+
+    @Autowired
+    public void setAnalysisSamplesService(AnalysisSamplesService analysisSamplesService) {
+        this.analysisSamplesService = analysisSamplesService;
+    }
 
     @Override
     public Long createAnalysis(User user) {
@@ -108,7 +113,10 @@ public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
             queryWrapper.eq("analysisId", analysisId);
             queryWrapper.eq("userId", userId);
             Analysis analysis = this.getOne(queryWrapper);
-
+            //查询Status如果不为101则不允许运行
+            if(analysis != null && analysis.getAnalysisStatus() != 101){
+                return CompletableFuture.completedFuture(false);
+            }
             try {
                 Path outputPath = Paths.get(analysisAllPath, analysisId.toString(), "output");
                 createDirectoriesRecursively(outputPath.toString());
@@ -186,20 +194,30 @@ public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
             // 运行完成后设置分析状态为2
             logger.info("[AnalysisService.waitForProcessAndUpdateStatus] Analysis ID:[{}] process finished.", analysisId);
             analysis.setAnalysisStatus(2);
+            this.updateById(analysis);
             // 遍历分析目录下的所有样本ID并将分析结果路径写入analysis_result表中
             Long[] dataIds = analysisSamplesService.getDataIds(analysisId, currentUser);
+            logger.info("[Analysis total data Num]:{}", dataIds.length);
             // 利用dataId从sample表中查询出对应的样本名
             for (Long dataId : dataIds) {
+                logger.info("[AnalysisService.waitForProcessAndUpdateStatus] Updating analysis result path for data ID:[{}]", dataId);
                 SampleData sampleData = sampleDataService.getSampleData(dataId, currentUser);
                 analysisResultService.updateAllResultPath(analysisId, sampleData.getSampleId(), moduleSwitchCode);
             }
             // analysisResultService.updateAllResultPath(analysisId, analysis, moduleSwitchCode);
-            this.updateById(analysis);
+
         } catch (InterruptedException e) {
             // 运行失败后设置分析状态为3
             analysis.setAnalysisStatus(3);
+            this.updateById(analysis);
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void updateAnalysisStatus(Long analysisId, Integer status) {
+        Analysis analysis = this.getById(analysisId);
+        analysis.setAnalysisStatus(status); // 索引已建好可以开始分析
     }
 
 

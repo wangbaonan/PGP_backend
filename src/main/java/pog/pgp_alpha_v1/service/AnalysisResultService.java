@@ -13,21 +13,21 @@ public interface AnalysisResultService extends IService<AnalysisResult> {
     void updateAllResultPath(Long analysisId, String sampleId, int moduleSwitchCode);
 
     //获取分析结果的路径
-    String getPrsResultPath(Long analysisId, String sampleId);
-    String getAncestryResultPath(Long analysisId, String sampleId);
-    String getSimilarityResultPath(Long analysisId, String sampleId);
-    String getArchaicSegResultPath(Long analysisId, String sampleId);
-    String getArchaicSumResultPath(Long analysisId, String sampleId);
-    String getDavidChartReportResultPath(Long analysisId, String sampleId);
-    String getDavidGeneClusterReportResultPath(Long analysisId, String sampleId);
-    String getDavidTermClusterReportResultPath(Long analysisId, String sampleId);
+    Object getPrsResultPath(Long analysisId, String sampleId);
+    Object getAncestryResultPath(Long analysisId, String sampleId);
+    Object getSimilarityResultPath(Long analysisId, String sampleId);
+    Object getArchaicSegResultPath(Long analysisId, String sampleId);
+    Object getArchaicSumResultPath(Long analysisId, String sampleId);
+    Object getDavidChartReportResultPath(Long analysisId, String sampleId);
+    Object getDavidGeneClusterReportResultPath(Long analysisId, String sampleId);
+    Object getDavidTermClusterReportResultPath(Long analysisId, String sampleId);
     String getArchaicPlotResultPath(Long analysisId, String sampleId);
-    String getPcaResultPath(Long analysisId, String sampleId);
-    String getSvResultPath(Long analysisId, String sampleId);
-    String getHlaResultPath(Long analysisId, String sampleId);
-    String getPrsHtmlResultPath(Long analysisId, String sampleId);
-    String getProvinceResultPath(Long analysisId, String sampleId);
-    String getMtyResultPath(Long analysisId, String sampleId);
-    String getSnpediaMedicineResultPath(Long analysisId, String sampleId);
-    String getSnpediaMedicalCondictionResultPath(Long analysisId, String sampleId);
+    Object getPcaResultPath(Long analysisId, String sampleId);
+    Object getSvResultPath(Long analysisId, String sampleId);
+    Object getHlaResultPath(Long analysisId, String sampleId);
+    Object getPrsHtmlResultPath(Long analysisId, String sampleId);
+    Object getProvinceResultPath(Long analysisId, String sampleId);
+    Object getMtyResultPath(Long analysisId, String sampleId);
+    Object getSnpediaMedicineResultPath(Long analysisId, String sampleId);
+    Object getSnpediaMedicalCondictionResultPath(Long analysisId, String sampleId);
 }

@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import pog.pgp_alpha_v1.mapper.AnalysisResultMapper;
 import pog.pgp_alpha_v1.model.AnalysisResult;
 import pog.pgp_alpha_v1.service.AnalysisResultService;
+import pog.pgp_alpha_v1.utils.JsonFileUtils;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -47,7 +49,7 @@ public class AnalysisResultServiceImpl extends ServiceImpl<AnalysisResultMapper,
             Path davidChartReportPath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_JSON" , "AS2" , "david.anno.chartReport.json");
             Path davidGeneClusterReportPath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_JSON" , "AS2" , "david.anno.geneClusterReport.json");
             Path davidTermClusterReportPath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_JSON" , "AS2" , "david.anno.termClusteringReport.json");
-            Path archaicPlotPath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_PNG" , "AS2" , "archaicChrPlot.svg");
+            Path archaicPlotPath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_JSON" , "AS2" , "archaicChrPlot.png");
             analysisResult.setArchaicSeg(archaicSegPath.toString());
             analysisResult.setArchaicSum(archaicSumPath.toString());
             analysisResult.setDavidChartReport(davidChartReportPath.toString());
@@ -93,7 +95,17 @@ public class AnalysisResultServiceImpl extends ServiceImpl<AnalysisResultMapper,
 
         if ((moduleSwitchCode & PRS_SWITCH.getValue()) != 0) {
             Path prsPath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_JSON" , "PRS" , "prs.json");
-            analysisResult.setPrs(prsPath.toString());
+            String prsScriptPath = "/home/pogadmin/PersonalGenome/src/scripts/PGS/process_prs.py";
+            Path processedPrsPath = Paths.get(analysisAllPath , String.valueOf(analysisId) , "output" , sampleId , "Res_JSON" , "PRS" , "processed_prs.json");
+            // Run the Python script
+            ProcessBuilder processBuilder = new ProcessBuilder("/share/apps/cluster/python-3.8.13/bin/python", prsScriptPath, prsPath.toString(), processedPrsPath.toString(), sampleId);
+            try {
+                Process process = processBuilder.start();
+                process.waitFor();
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+            analysisResult.setPrs(processedPrsPath.toString());
         } else {
             analysisResult.setPrs(null);
         }
@@ -120,54 +132,63 @@ public class AnalysisResultServiceImpl extends ServiceImpl<AnalysisResultMapper,
     }
 
     @Override
-    public String getPrsResultPath(Long analysisId, String sampleId) {
+    public Object getPrsResultPath(Long analysisId, String sampleId) {
         // 获取analysis_result表中的prs字段
         String prsPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getPrs();
-        return prsPath;
+        Object json = JsonFileUtils.readJsonFromFile(prsPath);
+        return json;
     }
 
     @Override
-    public String getAncestryResultPath(Long analysisId, String sampleId) {
+    public Object getAncestryResultPath(Long analysisId, String sampleId) {
         String ancestryPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getAncestry();
-        return ancestryPath;
+        Object json = JsonFileUtils.readJsonFromFile(ancestryPath);
+        return json;
     }
 
     @Override
-    public String getSimilarityResultPath(Long analysisId, String sampleId) {
+    public Object getSimilarityResultPath(Long analysisId, String sampleId) {
         String similarityPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getSimilarity();
-        return similarityPath;
+        Object json = JsonFileUtils.readJsonFromFile(similarityPath);
+        return json;
     }
 
     @Override
-    public String getArchaicSegResultPath(Long analysisId, String sampleId) {
+    public Object getArchaicSegResultPath(Long analysisId, String sampleId) {
         String archaicSegPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getArchaicSeg();
-        return archaicSegPath;
+        Object json = JsonFileUtils.readJsonFromFile(archaicSegPath);
+        return json;
     }
 
     @Override
-    public String getArchaicSumResultPath(Long analysisId, String sampleId) {
+    public Object getArchaicSumResultPath(Long analysisId, String sampleId) {
         String archaicSumPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getArchaicSum();
-        return archaicSumPath;
+        Object json = JsonFileUtils.readJsonFromFile(archaicSumPath);
+        return json;
     }
 
     @Override
-    public String getDavidChartReportResultPath(Long analysisId, String sampleId) {
+    public Object getDavidChartReportResultPath(Long analysisId, String sampleId) {
         String davidChartReportPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getDavidChartReport();
-        return davidChartReportPath;
+        Object json = JsonFileUtils.readJsonFromFile(davidChartReportPath);
+        return json;
     }
 
     @Override
-    public String getDavidGeneClusterReportResultPath(Long analysisId, String sampleId) {
+    public Object getDavidGeneClusterReportResultPath(Long analysisId, String sampleId) {
         String davidGeneClusterReportPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getDavidGeneClusterReport();
-        return davidGeneClusterReportPath;
+        Object json = JsonFileUtils.readJsonFromFile(davidGeneClusterReportPath);
+        return json;
     }
 
     @Override
-    public String getDavidTermClusterReportResultPath(Long analysisId, String sampleId) {
+    public Object getDavidTermClusterReportResultPath(Long analysisId, String sampleId) {
         String davidTermClusterReportPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getDavidTermClusterReport();
-        return davidTermClusterReportPath;
+        Object json = JsonFileUtils.readJsonFromFile(davidTermClusterReportPath);
+        return json;
     }
 
+    // 返回的是图片路径，controller中需要将图片转为流的形式
     @Override
     public String getArchaicPlotResultPath(Long analysisId, String sampleId) {
         String archaicPlotPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getArchaicPlot();
@@ -175,51 +196,59 @@ public class AnalysisResultServiceImpl extends ServiceImpl<AnalysisResultMapper,
     }
 
     @Override
-    public String getHlaResultPath(Long analysisId, String sampleId) {
+    public Object getHlaResultPath(Long analysisId, String sampleId) {
         String hlaPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getHla();
-        return hlaPath;
+        Object json = JsonFileUtils.readJsonFromFile(hlaPath);
+        return json;
     }
 
     @Override
-    public String getPrsHtmlResultPath(Long analysisId, String sampleId) {
+    public Object getPrsHtmlResultPath(Long analysisId, String sampleId) {
         String prsHtmlPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getPrsHtml();
-        return prsHtmlPath;
+        Object json = JsonFileUtils.readJsonFromFile(prsHtmlPath);
+        return json;
     }
 
     @Override
-    public String getMtyResultPath(Long analysisId, String sampleId) {
+    public Object getMtyResultPath(Long analysisId, String sampleId) {
         String mtyPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getMty();
-        return mtyPath;
+        Object json = JsonFileUtils.readJsonFromFile(mtyPath);
+        return json;
     }
 
     @Override
-    public String getPcaResultPath(Long analysisId, String sampleId) {
+    public Object getPcaResultPath(Long analysisId, String sampleId) {
         String pcaPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getPca();
-        return pcaPath;
+        Object json = JsonFileUtils.readJsonFromFile(pcaPath);
+        return json;
     }
 
     @Override
-    public String getProvinceResultPath(Long analysisId, String sampleId) {
+    public Object getProvinceResultPath(Long analysisId, String sampleId) {
         String provincePath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getProvince();
-        return provincePath;
+        Object json = JsonFileUtils.readJsonFromFile(provincePath);
+        return json;
     }
 
     @Override
-    public String getSnpediaMedicalCondictionResultPath(Long analysisId, String sampleId) {
+    public Object getSnpediaMedicalCondictionResultPath(Long analysisId, String sampleId) {
         String snpediaMedicalCondictionPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getSnpediaMedicalCondiction();
-        return snpediaMedicalCondictionPath;
+        Object json = JsonFileUtils.readJsonFromFile(snpediaMedicalCondictionPath);
+        return json;
     }
 
     @Override
-    public String getSnpediaMedicineResultPath(Long analysisId, String sampleId) {
+    public Object getSnpediaMedicineResultPath(Long analysisId, String sampleId) {
         String snpediaMedicinePath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getSnpediaMedicine();
-        return snpediaMedicinePath;
+        Object json = JsonFileUtils.readJsonFromFile(snpediaMedicinePath);
+        return json;
     }
 
     @Override
-    public String getSvResultPath(Long analysisId, String sampleId) {
+    public Object getSvResultPath(Long analysisId, String sampleId) {
         String svPath = this.getOne(new QueryWrapper<AnalysisResult>().eq("analysisId", analysisId).eq("sampleId", sampleId)).getSv();
-        return svPath;
+        Object json = JsonFileUtils.readJsonFromFile(svPath);
+        return json;
     }
 }
 

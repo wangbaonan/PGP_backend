@@ -59,4 +59,5 @@ public interface AnalysisService extends IService<Analysis> {
 
     @Async
     void waitForProcessAndUpdateStatus(Long analysisId, Analysis analysis, User currentUser, int moduleSwitchCode);
+    void updateAnalysisStatus(Long analysisId, Integer status);
 }

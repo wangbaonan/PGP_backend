@@ -15,4 +15,6 @@ public class UserLoginRequest implements Serializable {
     private String userAccount;
     //@ApiModelProperty(value = "The user's password", required = true)
     private String userPassword;
+    private String captchaKey;
+    private String captchaCode;
 }

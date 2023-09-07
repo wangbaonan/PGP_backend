@@ -10,6 +10,7 @@ import pog.pgp_alpha_v1.common.ResultUtils;
 import pog.pgp_alpha_v1.exception.BusinessException;
 import pog.pgp_alpha_v1.model.User;
 import pog.pgp_alpha_v1.model.request.*;
+import pog.pgp_alpha_v1.service.CaptchaCodeService;
 import pog.pgp_alpha_v1.service.EmailService;
 import pog.pgp_alpha_v1.service.UserService;
 import pog.pgp_alpha_v1.service.VerificationCodeService;
@@ -35,6 +36,8 @@ public class UserController {
     @Resource
     private VerificationCodeService verificationCodeService;
     @Resource
+    private CaptchaCodeService captchaCodeService;
+    @Resource
     private EmailService emailService;
 
     //@ApiOperation(value = "Register", response = BaseResponse.class)
@@ -55,12 +58,23 @@ public class UserController {
         String checkPassword = userRegisterRequest.getCheckPassword();
         String username = userRegisterRequest.getUsername();
         String mail = userRegisterRequest.getMail();
+        String captchaKey = userRegisterRequest.getCaptchaKey();
+        String captchaCode = userRegisterRequest.getCaptchaCode();
         // 本处校验不对业务逻辑进行校验
-        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword, username, mail)){
+        // 邮箱可以为空，但是不为空时需要校验格式
+        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword, username)){
             return null;
         }
-        long result = userService.userRegister(userAccount, userPassword, checkPassword, mail, username);
-        return ResultUtils.success(result);
+        // 验证captchaCode
+        if(!captchaCodeService.validateCaptchaCode(captchaKey, captchaCode)){
+            return ResultUtils.error(ErrorCode.CAPTCHA_CODE_ERROR);
+        }
+        Object result = userService.userRegister(userAccount, userPassword, checkPassword, mail, username);
+        if(result instanceof Long){
+            return ResultUtils.success(result);
+        }else {
+            return ResultUtils.error((ErrorCode) result);
+        }
     }
 
     // TODO 取消了BaseResponse的<>泛型，未验证是否会出现问题
@@ -85,14 +99,23 @@ public class UserController {
         if (StringUtils.isAnyBlank(userAccount, userPassword)){
             return null;
         }
+        String captchaKey = userLoginRequest.getCaptchaKey();
+        String captchaCode = userLoginRequest.getCaptchaCode();
+        // 验证captchaCode
+        if(!captchaCodeService.validateCaptchaCode(captchaKey, captchaCode)){
+            return ResultUtils.error(ErrorCode.CAPTCHA_CODE_ERROR);
+        }
         User user = userService.userLogin(userAccount, userPassword, request);
+
         if(user == null){
             // 用户名或密码错误
             return ResultUtils.error(ErrorCode.USER_LOGIN_ERROR);
         }
         else if (user.getUserVerify().equals(0)) {
-            // 用户未激活
-            return ResultUtils.error(ErrorCode.USER_NOT_ACTIVATED);
+            // 用户未激活 需要判断是否包含邮箱 如果该用户注册时未提供邮箱就直接登录成功
+            if(!StringUtils.isBlank(user.getMail())){
+                return ResultUtils.error(ErrorCode.USER_NOT_ACTIVATED);
+            }
         }
         return ResultUtils.success(user);
     }
@@ -151,6 +174,10 @@ public class UserController {
     public BaseResponse<String> sendVerificationCode(@RequestBody UserSendVerifyCodeRequest userSendVerifyCodeRequest) {
         // 获取邮箱
         String email = userSendVerifyCodeRequest.getMail();
+        // 判断邮箱是否已经注册如果已经注册但是未激活则直接发送验证码 如果已经注册并且已经激活则返回错误信息
+        if (userService.isEmailVerified(email)) {
+            return ResultUtils.error(ErrorCode.EMAIL_REGISTERED);
+        }
         // 生成验证码
         String verificationCode = verificationCodeService.generateVerificationCode();
         // 将邮箱与验证码绑定 存入Redis 并发送邮件
@@ -170,6 +197,10 @@ public class UserController {
     public String verify(@RequestBody UserVerifyRequest userVerifyRequest, RedirectAttributes redirectAttributes){
         String email = userVerifyRequest.getMail();
         String submittedCode = userVerifyRequest.getVerificationCode();
+        // 如果邮箱已经被验证过了
+        if (userService.isEmailVerified(email)) {
+            return ResultUtils.error(ErrorCode.EMAIL_REGISTERED).toString();
+        }
         if (verificationCodeService.verifyCode(email, submittedCode)) {
             // 验证成功 更新用户状态 删除验证码 重定向到登录页面 并提示成功
             userService.markUserAsVerified(email);

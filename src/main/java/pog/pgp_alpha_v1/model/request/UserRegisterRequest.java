@@ -21,4 +21,6 @@ public class UserRegisterRequest implements Serializable {
     private String mail;
     //@ApiModelProperty(value = "The user's username", required = true)
     private String username;
+    private String captchaKey;
+    private String captchaCode;
 }

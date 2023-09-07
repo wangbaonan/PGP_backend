@@ -3,12 +3,11 @@ package pog.pgp_alpha_v1.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import pog.pgp_alpha_v1.mapper.AnalysisMapper;
 import pog.pgp_alpha_v1.mapper.AnalysisSamplesMapper;
-import pog.pgp_alpha_v1.model.AnalysisSamples;
-import pog.pgp_alpha_v1.model.SampleData;
-import pog.pgp_alpha_v1.model.SvData;
-import pog.pgp_alpha_v1.model.User;
+import pog.pgp_alpha_v1.model.*;
 import pog.pgp_alpha_v1.service.AnalysisSamplesService;
 import pog.pgp_alpha_v1.service.SampleDataService;
 import pog.pgp_alpha_v1.service.SvDataService;
@@ -37,7 +36,8 @@ public class AnalysisSamplesServiceImpl extends ServiceImpl<AnalysisSamplesMappe
     // 这部分逻辑需要在新建分析的时候就创建好，这里只需要将样本添加到分析中
     @Resource
     private SvDataService svDataService;
-
+    @Resource
+    private AnalysisMapper analysisMapper;
     /**
      * 将样本添加到分析中
      *
@@ -101,9 +101,27 @@ public class AnalysisSamplesServiceImpl extends ServiceImpl<AnalysisSamplesMappe
             }
 
         }
+
         return true;
     }
 
+    @Override
+    @Async
+    public void addSamplesAsync(Analysis analysis, Long[] dataIds, User user) {
+        Long analysisId = analysis.getAnalysisId();
+        try {
+            addSamples(analysisId, dataIds, user);
+            updateAnalysisStatus(analysis,101); // 更新分析状态为样本添加完成
+        } catch (Exception e) {
+            updateAnalysisStatus(analysis,102); // 更新分析状态为样本添加失败
+        }
+    }
+
+    @Override
+    public void updateAnalysisStatus(Analysis analysis, Integer status) {
+        analysis.setAnalysisStatus(status); // 索引已建好可以开始分析
+        analysisMapper.updateById(analysis);
+    }
     /**
      * 将样本从分析中移除
      */

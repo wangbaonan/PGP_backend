@@ -1,5 +1,8 @@
 package pog.pgp_alpha_v1.controller;
 
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pog.pgp_alpha_v1.common.BaseResponse;
 import pog.pgp_alpha_v1.common.ResultUtils;
@@ -11,6 +14,10 @@ import pog.pgp_alpha_v1.service.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static pog.pgp_alpha_v1.constants.Constants.USER_LOGIN_STATE;
 
@@ -224,14 +231,28 @@ public class AnalysisController {
     }
 
     @PostMapping("/result/archaicPlot")
-    public BaseResponse getArchaicPlotResult(@RequestBody AnalysisResultGetRequest analysisResultGetRequest, HttpServletRequest request){
+    public ResponseEntity<InputStreamResource> getArchaicPlotResult(@RequestBody AnalysisResultGetRequest analysisResultGetRequest, HttpServletRequest request){
         Long analysisId = analysisResultGetRequest.getAnalysisId();
         String sampleId = analysisResultGetRequest.getSampleId();
         User currentUser = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
         if (currentUser == null) {
-            return new BaseResponse<>(-1, null, "用户未登录");
+            throw new RuntimeException("用户未登录");
         }
-        return ResultUtils.success(analysisResultService.getArchaicPlotResultPath(analysisId, sampleId));
+        String imagePathStr = analysisResultService.getArchaicPlotResultPath(analysisId, sampleId);
+        Path imagePath = Paths.get(imagePathStr);
+
+        // 创建一个新的InputStreamResource来处理流式传输
+        InputStreamResource resource;
+        try {
+            resource = new InputStreamResource(Files.newInputStream(imagePath));
+        } catch (IOException e) {
+            // 这里你需要处理文件读取失败的情况，例如返回错误信息或者抛出一个异常
+            throw new RuntimeException("无法读取图片文件", e);
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .body(resource);
     }
 
     @PostMapping("/result/pca")
@@ -320,5 +341,11 @@ public class AnalysisController {
             return new BaseResponse<>(-1, null, "用户未登录");
         }
         return ResultUtils.success(analysisResultService.getSnpediaMedicalCondictionResultPath(analysisId, sampleId));
+    }
+
+    @GetMapping("getDataIds")
+    public BaseResponse getDataIds(@RequestParam Long analysisId,HttpServletRequest request){
+        User currentUser = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
+        return ResultUtils.success(analysisSamplesService.getDataIds(analysisId,currentUser));
     }
 }

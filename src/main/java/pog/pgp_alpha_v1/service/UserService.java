@@ -20,7 +20,7 @@ public interface UserService extends IService<User> {
      * @param username      用户名
      * @return 返回id 失败为-1
      */
-    long userRegister(String userAccount, String userPassword, String checkPassword, String mail, String username);
+    Object userRegister(String userAccount, String userPassword, String checkPassword, String mail, String username);
 
     /**
      * 用户登录
@@ -35,4 +35,9 @@ public interface UserService extends IService<User> {
     boolean markUserAsVerified(String email);
     User getSafetyUser(User user);
     int userLogout(HttpServletRequest request);
+
+    // 判断邮箱是否已经注册
+    boolean isEmailRegistered(String email);
+    // 判断邮箱是否已激活
+    boolean isEmailVerified(String email);
 }

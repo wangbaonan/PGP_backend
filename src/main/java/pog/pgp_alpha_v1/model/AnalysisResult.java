@@ -1,7 +1,6 @@
 package pog.pgp_alpha_v1.model;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -17,12 +16,12 @@ public class AnalysisResult implements Serializable {
     /**
      * 分析ID
      */
-    @TableId
     private Long analysisId;
 
     /**
      * 样本ID
      */
+
     private String sampleId;
 
     /**

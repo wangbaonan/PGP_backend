@@ -54,7 +54,7 @@ public class Constants {
     /**
      * 成功
      */
-    public static final Integer SUCCESS = 0;
+    public static final Integer SUCCESS = 20000;
 
     /**
      * 验证码邮件发送成功
