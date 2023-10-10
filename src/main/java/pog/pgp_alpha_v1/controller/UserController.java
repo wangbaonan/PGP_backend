@@ -2,6 +2,7 @@ package pog.pgp_alpha_v1.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pog.pgp_alpha_v1.common.BaseResponse;
@@ -39,7 +40,14 @@ public class UserController {
     private CaptchaCodeService captchaCodeService;
     @Resource
     private EmailService emailService;
+    @Value("${my-app.devLogin.devLoginSwitch}")
+    private boolean devLoginSwitch;
 
+    @Value("${my-app.devLogin.devLoginUser}")
+    private String devLoginUser;
+
+    @Value("${my-app.devLogin.devLoginPassword}")
+    private String devLoginPassword;
     //@ApiOperation(value = "Register", response = BaseResponse.class)
 
     /**
@@ -120,6 +128,31 @@ public class UserController {
         return ResultUtils.success(user);
     }
     //@ApiOperation(value = "Search", response = BaseResponse.class)
+
+    /**
+     * 快速登录
+     */
+    @PostMapping("/quickLogin")
+    public BaseResponse quickLogin(HttpServletRequest request) {
+        if (!devLoginSwitch) {
+            return ResultUtils.error(ErrorCode.FORBIDDEN_OPERATION, "Quick login is not enabled");
+        }
+
+        // 使用提供的devLoginUser和devLoginPassword来模拟用户登录
+        User user = userService.userLogin(devLoginUser, devLoginPassword, request);
+
+        if (user == null) {
+            return ResultUtils.error(ErrorCode.USER_LOGIN_ERROR, "Quick login user not found");
+        }
+
+        // 如果用户未激活并且有邮箱，返回错误
+        if (user.getUserVerify().equals(0) && !StringUtils.isBlank(user.getMail())) {
+            return ResultUtils.error(ErrorCode.USER_NOT_ACTIVATED);
+        }
+
+        return ResultUtils.success(user);
+    }
+
 
     /**
      * 搜索用户

@@ -44,7 +44,8 @@ public enum ErrorCode {
     ACCOUNT_REPEAT_ERROR(40013, "The account has been registered", ""),
     REGISTER_ERROR(40014, "Registration failed", ""),
     INPUT_BLANK(40015, "Please ensure that the account, password, and check password are not empty", ""),
-    CAPTCHA_CODE_ERROR(40016, "Captcha verification code error", "");
+    CAPTCHA_CODE_ERROR(40016, "Captcha verification code error", ""),
+    FORBIDDEN_OPERATION(40300, "Forbidden operation", "");
 
 
 
