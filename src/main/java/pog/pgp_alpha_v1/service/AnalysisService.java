@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.scheduling.annotation.Async;
 import pog.pgp_alpha_v1.model.Analysis;
 import pog.pgp_alpha_v1.model.User;
+import pog.pgp_alpha_v1.model.message.AnalysisProgressInfo;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -24,11 +25,26 @@ public interface AnalysisService extends IService<Analysis> {
     Long createAnalysis(User user);
 
     /**
+     * 根据分析ID获取分析状态
+     * @param analysisId 分析ID
+     * @param user 用户
+     * @return 分析状态
+     */
+    Integer getAnalysisStatus(User user,Long analysisId);
+
+    /**
      * 获取用户的多个分析，由于是多个分析，所以返回的是一个List
      * @param user 用户
      * @return 分析列表
      */
     ArrayList<Analysis> getAnalysisList(User user);
+
+    /**
+     * 获取分析的进度信息
+     * @param analysisId 分析ID
+     * @return 分析进度信息
+     */
+    AnalysisProgressInfo getAnalysisProgressInfo(Long analysisId);
 
     /**
      * 删除分析
@@ -60,4 +76,7 @@ public interface AnalysisService extends IService<Analysis> {
     @Async
     void waitForProcessAndUpdateStatus(Long analysisId, Analysis analysis, User currentUser, int moduleSwitchCode);
     void updateAnalysisStatus(Long analysisId, Integer status);
+    void addAnalysisStatus(Long analysisId, Integer addStatus);
+    void initialAnalysisStatus(Long analysisId);
+    int getModuleSwitchCode(String moduleName);
 }

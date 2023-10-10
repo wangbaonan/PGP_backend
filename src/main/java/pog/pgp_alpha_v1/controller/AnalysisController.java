@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import pog.pgp_alpha_v1.common.BaseResponse;
 import pog.pgp_alpha_v1.common.ResultUtils;
 import pog.pgp_alpha_v1.model.User;
+import pog.pgp_alpha_v1.model.message.AnalysisProgressInfo;
 import pog.pgp_alpha_v1.model.request.AnalysisConfigRequest;
 import pog.pgp_alpha_v1.model.request.AnalysisResultGetRequest;
 import pog.pgp_alpha_v1.model.request.DeleteAnalysisSampleRequest;
@@ -115,6 +116,15 @@ public class AnalysisController {
         return ResultUtils.success(analysisSamplesService.getDataIds(analysisId, currentUser));
     }
 
+    @PostMapping("/status")
+    public BaseResponse<Integer> getAnalysisStatus(@RequestBody Long analysisId, HttpServletRequest request){
+        User currentUser = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
+        if (currentUser == null) {
+            return new BaseResponse<>(-1, null, "用户未登录");
+        }
+        return ResultUtils.success(analysisService.getAnalysisStatus(currentUser, analysisId));
+    }
+
     /**
      * 删除指定分析中的样本
      * @param request 用于获取当前用户
@@ -129,6 +139,11 @@ public class AnalysisController {
             return new BaseResponse<>(-1, null, "用户未登录");
         }
         return ResultUtils.success(analysisSamplesService.removeSamples(analysisId, dataIds, currentUser));
+    }
+
+    @PostMapping("/progress/{id}")
+    public BaseResponse<AnalysisProgressInfo> getAnalysisProgressInfo(@PathVariable("id") Long analysisId){
+        return ResultUtils.success(analysisService.getAnalysisProgressInfo(analysisId));
     }
 
     @GetMapping("/result/allelePopulationFrequencyData/{id}")

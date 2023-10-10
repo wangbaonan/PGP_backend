@@ -10,7 +10,14 @@ public class GlobalCorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOriginPatterns("*")
+                .allowedOrigins("http://localhost:8080",
+                        "http://192.168.0.106:8080",
+                        "http://10.157.73.88:8080",
+                        "http://192.168.1.104:8080",
+                        "http://192.168.3.116:8080",
+                        "http://192.168.3.210:8080",
+                        "http://10.157.46.249:8080",
+                        "http://10.157.73.42:8080")
                 .allowedMethods("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowCredentials(true)
                 .maxAge(3600)

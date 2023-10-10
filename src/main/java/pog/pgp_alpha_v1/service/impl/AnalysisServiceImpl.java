@@ -14,6 +14,7 @@ import pog.pgp_alpha_v1.mapper.AnalysisMapper;
 import pog.pgp_alpha_v1.model.Analysis;
 import pog.pgp_alpha_v1.model.SampleData;
 import pog.pgp_alpha_v1.model.User;
+import pog.pgp_alpha_v1.model.message.AnalysisProgressInfo;
 import pog.pgp_alpha_v1.service.AnalysisResultService;
 import pog.pgp_alpha_v1.service.AnalysisSamplesService;
 import pog.pgp_alpha_v1.service.AnalysisService;
@@ -75,6 +76,20 @@ public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
     }
 
     @Override
+    public Integer getAnalysisStatus(User user, Long analysisId) {
+        if(user != null && analysisId != null){
+            QueryWrapper<Analysis> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("analysisId", analysisId);
+            queryWrapper.eq("userId", user.getId());
+            Analysis analysis = this.getOne(queryWrapper);
+            if(analysis != null){
+                return analysis.getAnalysisStatus();
+            }
+        }
+        return null;
+    }
+
+    @Override
     public ArrayList<Analysis> getAnalysisList(User user) {
         if (user != null) {
             // 使用QueryWrapper来实现基于用户ID查询分析列表的方法
@@ -84,6 +99,46 @@ public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
             return (ArrayList<Analysis>) this.list(queryWrapper);
         }
         return null;
+    }
+
+    @Override
+    public AnalysisProgressInfo getAnalysisProgressInfo(Long analysisId) {
+        AnalysisProgressInfo analysisProgressInfo = new AnalysisProgressInfo();
+        Analysis analysis = this.getById(analysisId);
+        int analysisStatus = analysis.getAnalysisStatus();
+        analysisProgressInfo.setAnalysisStatus(analysisStatus);
+        analysisProgressInfo.setAnalysisId(analysisId);
+        analysisProgressInfo.setAllCompleted((analysisStatus & 1024) != 0);
+        ArrayList<String> completedModules = new ArrayList<>();
+        if ((analysisStatus & 2) != 0) {
+            completedModules.add("PCA");
+        }
+        else if ((analysisStatus & 4) != 0) {
+            completedModules.add("AS2");
+        }
+        else if ((analysisStatus & 8) != 0) {
+            completedModules.add("HLA");
+        }
+        else if ((analysisStatus & 16) != 0) {
+            completedModules.add("MT_Y");
+        }
+        else if ((analysisStatus & 32) != 0) {
+            completedModules.add("ADMIXTURE");
+        }
+        else if ((analysisStatus & 64) != 0) {
+            completedModules.add("PRS");
+        }
+        else if ((analysisStatus & 128) != 0) {
+            completedModules.add("SNPEDIA");
+        }
+        else if ((analysisStatus & 256) != 0) {
+            completedModules.add("SV");
+        }
+        else if ((analysisStatus & 512) != 0) {
+            completedModules.add("PROVINCE");
+        }
+        analysisProgressInfo.setCompletedModules(completedModules);
+        return analysisProgressInfo;
     }
 
     @Override
@@ -220,7 +275,60 @@ public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
         analysis.setAnalysisStatus(status); // 索引已建好可以开始分析
     }
 
+    @Override
+    public void addAnalysisStatus(Long analysisId, Integer addStatus) {
+        Analysis analysis = this.getById(analysisId);
+        // 在原有状态上加上新的状态，由于是二进制，后续可以通过与运算来判断是否存在某个状态。
+        analysis.setAnalysisStatus(analysis.getAnalysisStatus() + addStatus);
+    }
 
+    @Override
+    public void initialAnalysisStatus(Long analysisId) {
+        Analysis analysis = this.getById(analysisId);
+        analysis.setAnalysisStatus(0);
+    }
+
+    @Override
+    public int getModuleSwitchCode(String moduleName) {
+        switch (moduleName){
+            case "PCA":
+                return 2;
+            case "AS2":
+                return 4;
+            case "HLA":
+                return 8;
+            case "MT_Y":
+                return 16;
+            case "ADMIXTURE":
+                return 32;
+            case "PRS":
+                return 64;
+            case "SNPEDIA":
+                return 128;
+            case "SV":
+                return 256;
+            case "PROVINCE":
+                return 512;
+            default:
+                return 0;
+        }
+    }
+
+    /*
+        use switch code to set analysis status.
+        #define PCA_SWITCH 2 // 00000010
+        #define AS2_SWITCH 4 // 00000100
+        #define HLA_SWITCH 8 // ...
+        #define MTY_SWITCH 16
+        #define ADMIXTURE_SWITCH 32
+        #define PRS_SWITCH 64
+        #define SNPEDIA_SWITCH 128
+        #define SV_SWITCH 256
+        #define PROVINCE_SWITCH 512
+        #define ALL_DONE 1024
+     */
+
+    // 用于监控PGP.process文件
     @Override
     @Async
     public void monitorPGPProcessFile(Path outputPath, Long userId, Long analysisId) {
@@ -231,13 +339,13 @@ public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
             processFile.getParent().register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
             logger.info("[AnalysisService.monitorPGPProcessFile] Watching path: {}", processFile.getParent());
             boolean running = true;
+            boolean firstUpdate = true;
             String lastLine = null;
 
             while (running) {
                 WatchKey key = watchService.take();
                 for (WatchEvent<?> event : key.pollEvents()) {
                     WatchEvent.Kind<?> kind = event.kind();
-
                     if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
                         Path modifiedFile = (Path) event.context();
                         //logger.info("[AnalysisService.monitorPGPProcessFile] File modification event detected: {}", modifiedFile);
@@ -248,9 +356,20 @@ public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
                                 if (lastLine == null || !newLastLine.equals(lastLine)) {
                                     lastLine = newLastLine;
                                     if (lastLine.startsWith("[PROCESS]:")) {
+                                        if(firstUpdate){
+                                            initialAnalysisStatus(analysisId);
+                                            firstUpdate = false;
+                                        }
+                                        String moduleName = lastLine.substring("[PROCESS]:".length()).trim();
+                                        int moduleCode = getModuleSwitchCode(moduleName);
+                                        addAnalysisStatus(analysisId, moduleCode); // 将新的状态加和到分析状态中
+                                        // 后续保持了原有的Websocket通信，可以按需使用
                                         logger.info("[AnalysisService.monitorPGPProcessFile] : {}", lastLine);
                                         //logger.info("[AnalysisService.monitorPGPProcessFile] File modified: {}", modifiedFile);
                                         eventPublisher.publishEvent(new AnalysisProgressEvent(this, userId, analysisId, lastLine));
+                                    }else if (lastLine.startsWith("Done")){
+                                        // 只要捕获到Done就将状态设置为ALL_DONE
+                                        addAnalysisStatus(analysisId, getModuleSwitchCode("ALL_DONE"));
                                     }
                                 }
                             }
